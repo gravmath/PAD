@@ -244,11 +244,11 @@ def compute_ave_number_flux(jN,time_label,energy_label):
 #  numpy arrays
 #
 ###############################################################################
-def load_e_data(cdf_fh,MMS,species,ver,corrections_on,correction_override = 0):
+def load_e_data(cdf_fh,MMS,species,ver,corrections_on,correction_override = 0,source="DEBUG"):
     B                   = cdf_fh['bfield']
     
     edist, parms        = unpack_FS_dist_CDF(cdf_fh,MMS,species,ver,corrections_on,correction_override)
-    bfield              = fetch_magnetic_field(B,MMS,species)
+    bfield              = fetch_magnetic_field(B,MMS,species,source)
     v_dirs              = calculate_incoming_particle_directions(parms)
     counts              = compute_counts(edist)
     jN                  = compute_number_flux(edist,parms)
