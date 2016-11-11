@@ -50,6 +50,69 @@ def unpack_FS_dist_CDF(cdf_fh,MMS,species,ver,corrections_on,correction_override
     
     return FS_dist, FS_params
 
+###############################################################################	
+#
+# bisect_epochs finds a set of epochs in one signal that bracket a target
+# epoch.  The indices for these bracketing points are returned.
+#
+###############################################################################
+def bisect_epochs(target_epoch,epochs):
+    low_index   = 0
+    high_index  = len(epochs)
+
+    old_trial_index = low_index
+    trial_index     = high_index
+    
+    while( abs(old_trial_index - trial_index) > 1):
+        old_trial_index = trial_index
+        trial_index     = np.int(np.floor((high_index + low_index)/2.0 ))
+        trial_epoch     = epochs[trial_index]
+        if (trial_epoch - target_epoch).total_seconds() < 0:
+            low_index       = trial_index
+        else:
+            high_index = trial_index
+
+    #a test for what may happen for odd number of points in the 
+    #epoch array
+    if(high_index == low_index):
+        #found out if the common epoch is above or below target
+        if (epochs[high_index] - target_epoch).total_seconds() < 0:
+            high_index = high_index + 1
+        else:
+            low_index  = low_index - 1
+
+    return low_index, high_index
+    
+###############################################################################	
+#
+# fetch_AFG_B_field takes the set of CDFs (cdf_fh) and interpolated the AFG
+# magnetic field to the FPI points
+#
+###############################################################################
+def fetch_AFG_B_field(cdf_fh,species):
+    B       = np.zeros( (len(cdf_fh['dist']['Epoch']),4) )
+    B_str   = '%s_afg_srvy_l2pre_dmpa' % species
+
+    counter = 0
+    for e in cdf_fh['dist']['Epoch']:
+        low_index, high_index = bisect_epochs(e,cdf_fh['AFG']['Epoch'])
+        epoch_low    = cdf_fh['AFG']['Epoch'][low_index]
+        epoch_high   = cdf_fh['AFG']['Epoch'][high_index]        
+        h            = (epoch_high - epoch_low).total_seconds()
+        dt           = (epoch_high - e).total_seconds()
+        B_low        = cdf_fh['AFG'][B_str][low_index]
+        B_high       = cdf_fh['AFG'][B_str][high_index]
+        B_e          = B_low + (B_high-B_low)*(dt/h)
+        B[counter,:] = B_e
+        counter      = counter + 1
+        
+    B[:,3] = np.sqrt(B[:,0]**2 + B[:,1]**2 + B[:,2]**2)
+    B[:,0] = B[:,0]/B[:,3]
+    B[:,1] = B[:,1]/B[:,3]
+    B[:,2] = B[:,2]/B[:,3]
+
+    return B
+    
 
 ###############################################################################	
 #
@@ -64,7 +127,7 @@ def unpack_FS_dist_CDF(cdf_fh,MMS,species,ver,corrections_on,correction_override
 #            B  - magnetic field magnitude         in index 3
 #
 ###############################################################################
-def fetch_magnetic_field(cdf_fh,MMS,species):
+def fetch_magnetic_field(cdf_fh,MMS,species,source="DEBUG"):
     Bx_str = '%s_%s_bentPipeB_X_DSC'       % (MMS,species)
     By_str = '%s_%s_bentPipeB_Y_DSC'       % (MMS,species)
     Bz_str = '%s_%s_bentPipeB_Z_DSC'       % (MMS,species)
@@ -74,13 +137,14 @@ def fetch_magnetic_field(cdf_fh,MMS,species):
     #           'By' : np.asarray(cdf_fh[By_str][:]),
     #           'Bz' : np.asarray(cdf_fh[Bz_str][:]),
     #           'B'  : np.asarray(cdf_fh[B_str][:]),}
-    
-    Bx     = np.asarray(cdf_fh[Bx_str])
-    By     = np.asarray(cdf_fh[By_str])
-    Bz     = np.asarray(cdf_fh[Bz_str])
-    B      = np.asarray(cdf_fh[B_str])
-    
-    B_field = np.vstack((Bx,By,Bz,B)).transpose()
+    if source == "DEBUG":
+        Bx     = np.asarray(cdf_fh[Bx_str])
+        By     = np.asarray(cdf_fh[By_str])
+        Bz     = np.asarray(cdf_fh[Bz_str])
+        B      = np.asarray(cdf_fh[B_str])
+        B_field = np.vstack((Bx,By,Bz,B)).transpose()
+    if source == "AFG":
+        B_field = fetch_AFG_B_field(cdf_fh,species)
 
     return B_field
 
