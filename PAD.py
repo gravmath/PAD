@@ -160,14 +160,14 @@ def calculate_incoming_particle_directions(parms):
     num_polar = parms['Theta'].shape[0]
     deg       = sp.pi/180    
 
-    V = np.zeros((num_az,num_polar,3))
+    v_dirs    = np.zeros((num_az,num_polar,3))
     for i in range(num_az):
         for j in range(num_polar):
-            phi   = parms['Phi']  [i]*deg
-            theta = parms['Theta'][j]*deg
-            V[i,j] = [-sp.sin(theta)*sp.cos(phi),-sp.sin(theta)*sp.sin(phi),-sp.cos(theta)]
+            phi         = parms['Phi']  [i]*deg
+            theta       = parms['Theta'][j]*deg
+            v_dirs[i,j] = [-sp.sin(theta)*sp.cos(phi),-sp.sin(theta)*sp.sin(phi),-sp.cos(theta)]
             
-    return V
+    return v_dirs
 	
 ###############################################################################    
 #
@@ -176,7 +176,7 @@ def calculate_incoming_particle_directions(parms):
 # pixel
 #
 ###############################################################################
-def calculate_pitch_angles(v,bfield,time_label):
+def calculate_pitch_angles(v_dirs,bfield,time_label):
     #Construct the B field unit vector at chosen time
     Bx = bfield[time_label,0]
     By = bfield[time_label,1]
@@ -184,9 +184,9 @@ def calculate_pitch_angles(v,bfield,time_label):
     
     pitch_angles = np.zeros(v.shape[0:2])
     
-    for i in range(0,v.shape[0]):
-        for j in range(0,v.shape[1]):
-            U                 = v[i,j]
+    for i in range(0,v_dirs.shape[0]):
+        for j in range(0,v_dirs.shape[1]):
+            U                 = v_dirs[i,j]
             dot_prod          = U[0]*Bx + U[1]*By + U[2]*Bz
             if np.abs(dot_prod) > 1.0:
                 if np.abs(dot_prod) > 1.001:
@@ -231,6 +231,8 @@ def compute_number_flux(FS_dist,FS_parms):
 #
 # compute_ave_number_flux takes the number flux and gives the azimuthally-
 # averaged flux and returns the results
+#
+# !!!!currently deprecated - soon to be removed!!!!
 #
 ###############################################################################
 def compute_ave_number_flux(jN,time_label,energy_label):

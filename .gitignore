@@ -56,3 +56,6 @@ Temporary Items
 
 #python compile files
 *.pyc
+
+#blue marble jpg
+.\Blue Marble\bluemarble.jpg
