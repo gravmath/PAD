@@ -82,6 +82,17 @@ def bisect_epochs(target_epoch,epochs):
             low_index  = low_index - 1
 
     return low_index, high_index
+
+###############################################################################	
+#
+# detect_DMPA_str returns the appropriate AFG key for processing
+# obviates the need for hardcoded key 
+#
+###############################################################################
+def detect_DMPA_str(cdf_fh):
+    for k in cdf_fh['AFG'].keys():
+        if 'afg_srvy_l2pre_dmpa' in k:
+            return k 
     
 ###############################################################################	
 #
@@ -91,7 +102,7 @@ def bisect_epochs(target_epoch,epochs):
 ###############################################################################
 def fetch_AFG_B_field(cdf_fh,species):
     B       = np.zeros( (len(cdf_fh['dist']['Epoch']),4) )
-    B_str   = '%s_afg_srvy_l2pre_dmpa' % species
+    B_str   = detect_DMPA_str(cdf_fh)
 
     counter = 0
     for e in cdf_fh['dist']['Epoch']:
@@ -133,15 +144,11 @@ def fetch_magnetic_field(cdf_fh,MMS,species,source="DEBUG"):
     Bz_str = '%s_%s_bentPipeB_Z_DSC'       % (MMS,species)
     B_str  = '%s_%s_bentPipeB_Norm'        % (MMS,species)  
     
-    #B_field = {'Bx' : np.asarray(cdf_fh[Bx_str][:]),
-    #           'By' : np.asarray(cdf_fh[By_str][:]),
-    #           'Bz' : np.asarray(cdf_fh[Bz_str][:]),
-    #           'B'  : np.asarray(cdf_fh[B_str][:]),}
     if source == "DEBUG":
-        Bx     = np.asarray(cdf_fh[Bx_str])
-        By     = np.asarray(cdf_fh[By_str])
-        Bz     = np.asarray(cdf_fh[Bz_str])
-        B      = np.asarray(cdf_fh[B_str])
+        Bx     = np.asarray(cdf_fh['bfield'][Bx_str])
+        By     = np.asarray(cdf_fh['bfield'][By_str])
+        Bz     = np.asarray(cdf_fh['bfield'][Bz_str])
+        B      = np.asarray(cdf_fh['bfield'][B_str])
         B_field = np.vstack((Bx,By,Bz,B)).transpose()
     if source == "AFG":
         B_field = fetch_AFG_B_field(cdf_fh,species)
@@ -182,7 +189,7 @@ def calculate_pitch_angles(v_dirs,bfield,time_label):
     By = bfield[time_label,1]
     Bz = bfield[time_label,2]
     
-    pitch_angles = np.zeros(v.shape[0:2])
+    pitch_angles = np.zeros(v_dirs.shape[0:2])
     
     for i in range(0,v_dirs.shape[0]):
         for j in range(0,v_dirs.shape[1]):
@@ -227,6 +234,26 @@ def compute_number_flux(FS_dist,FS_parms):
     #jN     = coeff*FS_dist['Dist'] - don't know why this worked in the first place
     return jN   
 
+    
+###############################################################################
+#
+# compute_number_flux_error computes the errors in the number flux given the
+# errors in the distribution function
+#
+###############################################################################
+def compute_number_flux_errors(FS_dist,FS_parms):
+    m_e    = 9.10938356e-31  #mass of electron in Kg
+    eV     = 1.60218e-19     #energy of 1 electron-volt in Joules
+    E      = FS_parms['Erg']
+    coeff  = 2.0*(E*eV/m_e)**2/E *100.0**4 #100**2 for m -> cm
+    jN_err = np.zeros(FS_dist['Err'].shape)
+    counter = 0
+    for c in coeff:
+        jN_err[:,:,:,counter] = c * FS_dist['Err'][:,:,:,counter]
+        counter               = counter + 1
+    
+    return jN_err
+    
 ###############################################################################	
 #
 # compute_ave_number_flux takes the number flux and gives the azimuthally-
@@ -247,13 +274,13 @@ def compute_ave_number_flux(jN,time_label,energy_label):
 #
 ###############################################################################
 def load_e_data(cdf_fh,MMS,species,ver,corrections_on,correction_override = 0,source="DEBUG"):
-    B                   = cdf_fh['bfield']
     
     edist, parms        = unpack_FS_dist_CDF(cdf_fh,MMS,species,ver,corrections_on,correction_override)
-    bfield              = fetch_magnetic_field(B,MMS,species,source)
+    bfield              = fetch_magnetic_field(cdf_fh,MMS,species,source)
     v_dirs              = calculate_incoming_particle_directions(parms)
     counts              = compute_counts(edist)
     jN                  = compute_number_flux(edist,parms)
+    jN_err              = compute_number_flux_errors(edist,parms)
     
     core_data           = {}
     core_data['edist']  = edist
@@ -261,7 +288,8 @@ def load_e_data(cdf_fh,MMS,species,ver,corrections_on,correction_override = 0,so
     core_data['bfield'] = bfield
     core_data['v_dirs'] = v_dirs
     core_data['counts'] = counts
-    core_data['jN']     = jN    
+    core_data['jN']     = jN
+    core_data['jN_err'] = jN_err
     
     return core_data    
     
@@ -305,7 +333,10 @@ def subtract_internal_photoelectrons(cdf_fh,raw_Dist,MMS,species,correction_over
         #subtract off the correction
         corrected_Dist[k,:,:,:] = raw_Dist[k,:,:,:] - n_photo*f_photo[correction_index,:,:,:]
         
-    #return results
+    #floor the negative values at zero
+    corrected_Dist[corrected_Dist < 0.0 ] = 0.0
+
+    #return results    
     return corrected_Dist
     
     
@@ -334,6 +365,30 @@ def compute_limited_PAD(time_label,minE,maxE,minPA,maxPA,core_data):
         
     return Edata, FAC
 
+###############################################################################
+#
+# compute_limited_PAD_error returns a truncated PAD_errpr limited by energy and 
+# pitch angle from the full data
+#
+###############################################################################
+def compute_limited_PAD_error(time_label,minE,maxE,minPA,maxPA,core_data):
+    #find the truncated energy range
+    Edata                     = core_data['parms']['Erg'][minE:maxE]
+    
+    #get the pitch angles and then flatten to a 1-D array
+    pitch_angles              = calculate_pitch_angles(core_data['v_dirs'],core_data['bfield'],time_label)
+    flat_PA                   = np.ndarray.flatten(pitch_angles)
+    
+    FAC_err                   = np.zeros(len(range(minE,maxE)))
+    counter                   = 0
+    for energy_label in range(minE,maxE):
+        local_jN_err          = np.ndarray.flatten(core_data['jN_err'][time_label,:,:,energy_label])
+        PA_table              = np.array(zip(flat_PA,local_jN_err))
+        PA_range              = np.where( (flat_PA > minPA) & (flat_PA < maxPA))
+        FAC_err[counter]      = np.mean(PA_table[PA_range][:,1])
+        counter              += 1        
+        
+    return Edata, FAC_err
 
     
     
