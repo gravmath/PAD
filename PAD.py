@@ -434,8 +434,8 @@ def create_flux_survey_spectrum(time_label,time_range_str,filepath,core_data):
     title_string = 'Binned PADs for %s\n (red -binned, blue-omnidirectional)' % core_data['edist']['Epoch'][time_label]
     big_ax.set_title(title_string, fontsize=14)
     fig1.tight_layout()    
-    filename = filepath+'flux_specturm_survey_'+time_range_str+'_%i.png' % time_label
-    fig1.savefig(filename,dpi=300)
+    filename = filepath+'flux_specturm_survey_'+time_range_str+'_%i.pdf' % time_label
+    fig1.savefig(filename,format='pdf',dpi=1200)
     fig1.clf()
     plt.close()
 
@@ -460,8 +460,8 @@ def create_smooth_survey_PAD_plot(time_label,time_range_str,filepath,core_data):
     lgd = ax.legend(handles, labels, loc='lower left',bbox_to_anchor=(1, 0.5))
     plt.title(core_data['edist']['Epoch'][time_label])
     plt.grid(b=True, which='major', color='gray', linestyle='-')
-    filename = filepath+'Smooth_PAD_survey_'+time_range_str+'_%i.png' % time_label
-    fig1.savefig(filename,dpi=300,bbox_extra_artists=(lgd,),bbox_inches='tight')    
+    filename = filepath+'Smooth_PAD_survey_'+time_range_str+'_%i.pdf' % time_label
+    fig1.savefig(filename,format='pdf',dpi=1200,bbox_extra_artists=(lgd,),bbox_inches='tight')    
     fig1.clf()
     plt.close()
 
@@ -484,8 +484,8 @@ def create_raw_survey_PAD_plot(time_label,Elow,Ehigh,time_range_str,filepath,cor
     plt.title(core_data['edist']['Epoch'][time_label])
     plt.grid(b=True, which='major', color='gray', linestyle='-')
     plt.grid(b=True, which='minor', color='gray', linestyle='--')
-    filename = filepath+'Raw_PAD_survey_'+time_range_str+'_%i.png' % time_label
-    fig1.savefig(filename,dpi=300,bbox_extra_artists=(lgd,),bbox_inches='tight')    
+    filename = filepath+'Raw_PAD_survey_'+time_range_str+'_%i.pdf' % time_label
+    fig1.savefig(filename,format='pdf',dpi=1200,bbox_extra_artists=(lgd,),bbox_inches='tight')    
     fig1.clf()
     plt.close()
 
@@ -536,8 +536,8 @@ def create_raw_survey_PAD_plot_LM(time_label,Elow,Ehigh,time_range_str,filepath,
     plt.title(core_data['edist']['Epoch'][time_label])
     plt.grid(b=True, which='major', color='gray', linestyle='-')
     plt.grid(b=True, which='minor', color='gray', linestyle='--')   
-    filename = filepath+'Raw_PAD_survey_LM_'+time_range_str+'_%i.png' % time_label
-    fig1.savefig(filename,dpi=300,bbox_extra_artists=(lgd,),bbox_inches='tight')
+    filename = filepath+'Raw_PAD_survey_LM_'+time_range_str+'_%i.pdf' % time_label
+    fig1.savefig(filename,format='pdf',dpi=1200,bbox_extra_artists=(lgd,),bbox_inches='tight')
     fig1.clf()
     plt.close()
 
