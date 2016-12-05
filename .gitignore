@@ -58,4 +58,7 @@ Temporary Items
 *.pyc
 
 #blue marble jpg
-.\Blue Marble\bluemarble.jpg
+./**/bluemarble.jpg
+
+#temp windows files
+~$*.*
