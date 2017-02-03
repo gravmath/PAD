@@ -15,7 +15,7 @@ import sys
 def compute_fill_val(array):
     
     if np.max(array) > 0.0:
-        fill_val = np.max(temp)
+        fill_val = np.max(array)
     else:
         fill_val = 1.0
         
@@ -128,7 +128,7 @@ def make_FS_summary_plot(obs,curr_debug):
     cb_ax0.set_yticklabels(cbar_span)
     
     #put on a title
-    ax0.set_title('MMS1 on %s' % FS_time)
+    ax0.set_title('%s on %s' % (obs.upper(),FS_time))
     
     #add the spacecraft potential
     ax6 = ax0.twinx()
