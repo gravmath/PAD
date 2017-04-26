@@ -489,27 +489,27 @@ def make_brst_summary_plot(obs,curr_debug):
     mean_par        = np.mean(par)
     mean_anti       = np.mean(anti)
     ratio           = np.ma.masked_invalid(np.divide(par,anti))
-    ratio[ratio > 1.4]     = 1.4
-    ratio[ratio < 0.6]     = 0.6
     
     BRST_time = dt.datetime.strftime(times[0],'%Y-%m-%d_%H%M')
-    #Rects     = find_sign_intervals(times,bx)
     
     ###########################################################################
     #create the figure and axes
     fig = plt.figure(figsize=(16,20))
     #fig.autofmt_xdate()
     
-    cbar_xloc = 0.925
+    cbar_off = 0.01
+    cbar_wth = 0.01
     cmap.jet.set_bad('k',alpha=1.0)    
     cmap.bwr.set_bad('k',alpha=1.0)    
     
     ###########################################################################
     #0th pane - spectrogram
-    ax0 = fig.add_subplot(611)
+    min_exp = 4
+    max_exp = 8
+    ax0     = fig.add_subplot(611)
     
     #plot the data
-    spec_data = ax0.pcolormesh(times,energies,omni,cmap=cmap.jet)
+    spec_data = ax0.pcolormesh(times,energies,omni,cmap=cmap.jet,vmin=max_exp,vmax=min_exp)
     
     #deal with epochs on the x-axis
     time_format = mdates.DateFormatter('%H:%M')
@@ -524,29 +524,25 @@ def make_brst_summary_plot(obs,curr_debug):
     ax0.set_ylabel('Energy (eV)')
     
     #create the colorbar
-    max_exp       = 4#np.ceil(np.max(omni))
-    min_exp       = 8#np.floor(np.min(omni))
-    log_cbar_span = np.array(range(min_exp,max_exp))
-    cb_ax0        = fig.add_axes([cbar_xloc, 0.785714, 0.01, 0.114286])
-    spec_cbar     = fig.colorbar(spec_data,ticks=log_cbar_span,cax=cb_ax0)
-    cbar_span     = ['%1.1e' % val for val in 10**log_cbar_span]
+    log_cbar_span = np.array(range(min_exp,max_exp+1))
+    cb_ax0        = fig.add_axes(cbar_position(ax0,cbar_off,cbar_wth))
+    spec_cbar     = fig.colorbar(spec_data,cax=cb_ax0,ticks=log_cbar_span)
+    cbar_span     = ['%1.0e' % val for val in 10.0**log_cbar_span]
     cb_ax0.set_yticklabels(cbar_span)
     
     #put on a title
     ax0.set_title('%s on %s' % (obs.upper(),BRST_time))
     
-    #add the spacecraft potential
-    #ax6 = ax0.twinx()
     ax0.plot(times,sc_pot,'k-')
-    #ax6.set_ylim([0,20])
-    #ax6.set_ylabel('SC Potential (V)')
     
     ###########################################################################
     #1st pane - low energy PAD
+    min_exp = 4
+    max_exp = 8
     ax1 = fig.add_subplot(612)
     
     #plot the data
-    PAD_low_ax = ax1.pcolormesh(times,angles,low,cmap=cmap.bwr)
+    PAD_low_dat = ax1.pcolormesh(times,angles,low,cmap=cmap.bwr)
     
     #deal with epochs on the x-axis
     time_format = mdates.DateFormatter('%H:%M')
@@ -561,21 +557,21 @@ def make_brst_summary_plot(obs,curr_debug):
     ax1.set_ylabel('Low Pitch Ang (deg)')
     
     #create the colorbar
-    max_exp       = np.ceil(np.max(low))
-    min_exp       = np.floor(np.min(low))
-    log_cbar_span = np.array(range(min_exp,max_exp))
-    cb_ax1        = fig.add_axes([cbar_xloc,0.648571,0.01,0.114286])
-    PAD_low_cbar  = fig.colorbar(PAD_low_ax,ticks=log_cbar_span,cax=cb_ax1)
-    cbar_span     = ['%1.1e' % val for val in 10**log_cbar_span]
+    log_cbar_span = np.array(range(min_exp,max_exp+1))
+    cb_ax1        = fig.add_axes(cbar_position(ax1,cbar_off,cbar_wth))
+    PAD_low_cbar  = fig.colorbar(PAD_low_dat,cax=cb_ax1,ticks=log_cbar_span)
+    cbar_span     = ['%1.0e' % val for val in 10**log_cbar_span]
     cb_ax1.set_yticklabels(cbar_span)
 
      
     ###########################################################################
     #2nd pane - mid energy PAD
+    min_exp       = 4
+    max_exp       = 8    
     ax2 = fig.add_subplot(613)
     
     #plot the data
-    PAD_mid_ax = ax2.pcolormesh(times,angles,mid,cmap=cmap.bwr)
+    PAD_mid_dat = ax2.pcolormesh(times,angles,mid,cmap=cmap.bwr)
     
     #deal with epochs on the x-axis
     time_format = mdates.DateFormatter('%H:%M')
@@ -590,21 +586,21 @@ def make_brst_summary_plot(obs,curr_debug):
     ax2.set_ylabel('Mid Pitch Ang (deg)')
     
     #create the colorbar
-    max_exp       = np.ceil(np.max(mid))
-    min_exp       = np.floor(np.min(mid))
-    log_cbar_span = np.array(range(min_exp,max_exp))
-    cb_ax2        = fig.add_axes([cbar_xloc,0.511429,0.01,0.114286])
-    PAD_mid_cbar  = fig.colorbar(PAD_mid_ax,ticks=log_cbar_span,cax=cb_ax2)
-    cbar_span     = ['%1.1e' % val for val in 10**log_cbar_span]
+    log_cbar_span = np.array(range(min_exp,max_exp+1))
+    cb_ax2        = fig.add_axes(cbar_position(ax2,cbar_off,cbar_wth))
+    PAD_mid_cbar  = fig.colorbar(PAD_mid_dat,ticks=log_cbar_span,cax=cb_ax2)
+    cbar_span     = ['%1.0e' % val for val in 10**log_cbar_span]
     cb_ax2.set_yticklabels(cbar_span)
     
 
     ###########################################################################
     #3rd pane - high energy PAD
+    min_exp       = 4
+    max_exp       = 8
     ax3 = fig.add_subplot(614)
     
     #plot the data
-    PAD_high_ax = ax3.pcolormesh(times,angles,high,cmap=cmap.bwr)
+    PAD_high_dat = ax3.pcolormesh(times,angles,high,cmap=cmap.bwr)
     
     #deal with epochs on the x-axis
     time_format = mdates.DateFormatter('%H:%M')
@@ -619,12 +615,10 @@ def make_brst_summary_plot(obs,curr_debug):
     ax3.set_ylabel('Hi Pitch Ang (deg)')
     
     #create the colorbar
-    max_exp       = np.ceil(np.max(high))
-    min_exp       = np.floor(np.min(high))
-    log_cbar_span = np.array(range(min_exp,max_exp))
-    cb_ax3        = fig.add_axes([cbar_xloc,0.374286,0.01,0.114286])
-    PAD_high_cbar = fig.colorbar(PAD_high_ax,cax=cb_ax3,ticks=log_cbar_span)
-    cbar_span     = ['%1.1e' % val for val in 10**log_cbar_span]
+    log_cbar_span = np.array(range(min_exp,max_exp+1))
+    cb_ax3        = fig.add_axes(cbar_position(ax3,cbar_off,cbar_wth))
+    PAD_high_cbar = fig.colorbar(PAD_high_dat,cax=cb_ax3,ticks=log_cbar_span)
+    cbar_span     = ['%1.0e' % val for val in 10**log_cbar_span]
     cb_ax3.set_yticklabels(cbar_span)
 
     ###########################################################################
@@ -632,14 +626,7 @@ def make_brst_summary_plot(obs,curr_debug):
     ax4 = fig.add_subplot(615)
     
     #plot the data
-    asym_data = ax4.pcolormesh(times,energies,ratio,cmap=cmap.bwr)
-    #ax4.axhline(50.0,c='k')
-    #for r in Rects:
-    #    start_x   = r[0]
-    #    start_y   = 50
-    #    width     = r[1]
-    #   thickness = 100
-    #ax4.add_patch(patches.Rectangle((start_x,start_y),width,thickness,color=r[2],alpha=0.5))
+    asym_data = ax4.pcolormesh(times,energies,ratio,cmap=cmap.bwr,vmin=0.6,vmax=1.4)
     
     #deal with epochs on the x-axis
     time_format = mdates.DateFormatter('%H:%M')
@@ -654,12 +641,8 @@ def make_brst_summary_plot(obs,curr_debug):
     ax4.set_ylabel('Energy (eV)')
     
     #create the colorbar
-    max_ratio       = 2#int(np.ceil( np.max(ratio)))
-    min_ratio       = 0#int(np.floor(np.min(ratio)))
-    cbar_span       = np.asarray(range(min_ratio,max_ratio+1))
-    cb_ax4          = fig.add_axes([cbar_xloc,0.237143,0.01,0.114286])
-    asym_cbar       = fig.colorbar(asym_data,cax=cb_ax4)#ticks=cbar_span
-    #cb_ax4.set_yticklabels(cbar_span)
+    cb_ax4          = fig.add_axes(cbar_position(ax4,cbar_off,cbar_wth))
+    asym_cbar       = fig.colorbar(asym_data,cax=cb_ax4)
 
     ###########################################################################
     #5th pane - mag field
@@ -690,3 +673,9 @@ def make_brst_summary_plot(obs,curr_debug):
     fig.savefig(filename)
     fig.clf()
     
+#####################################################################################   
+def cbar_position(current_ax,offset,cbar_width):
+    #get the tuple describing the lower x,y corner position
+    #and the width and height
+    x_pos, y_pos, width, height = current_ax.get_position().bounds
+    return [x_pos + width + offset, y_pos, cbar_width, height]    
