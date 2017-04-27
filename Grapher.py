@@ -3,6 +3,7 @@ import matplotlib.cm      as cmap
 import matplotlib.dates   as mdates
 import matplotlib.patches as patches
 import matplotlib.pyplot  as plt
+import matplotlib.ticker  as ticker
 import numpy              as np
 
     
@@ -233,238 +234,7 @@ def find_sign_intervals(times,signal):
     return Rects
 
 #####################################################################################
-def make_fast_summary_plot(obs,curr_debug):
-    #unpack the CDF
-    times           = np.asarray(curr_debug['Epoch'])
-    energies        = np.asarray(curr_debug['%s_des_energy_fast' % obs])[0,:]
-    sc_pot          = np.asarray(curr_debug['%s_des_scpot_mean_fast' % obs])
-    bx              = np.asarray(curr_debug['%s_des_bentPipeB_X_DSC' % obs])
-    by              = np.asarray(curr_debug['%s_des_bentPipeB_Y_DSC' % obs])
-    bz              = np.asarray(curr_debug['%s_des_bentPipeB_Z_DSC' % obs])
-    bnorm           = np.asarray(curr_debug['%s_des_bentPipeB_Norm' % obs])
-    par             = np.asarray(curr_debug['%s_des_energyspectr_par_fast' % obs]).T
-    anti            = np.asarray(curr_debug['%s_des_energyspectr_anti_fast' % obs]).T
-    temp            = np.asarray(curr_debug['%s_des_energyspectr_omni_fast' % obs])
-    omni            = np.ma.masked_invalid(np.log10(temp).T)
-    temp            = np.asarray(curr_debug['%s_des_pitchangdist_lowen_fast' % obs])
-    low             = np.ma.masked_array(np.log10(temp).T)
-    temp            = np.asarray(curr_debug['%s_des_pitchangdist_miden_fast' % obs])
-    mid             = np.ma.masked_invalid(np.log10(temp).T)
-    temp            = np.asarray(curr_debug['%s_des_pitchangdist_highen_fast' % obs])
-    high            = np.ma.masked_invalid(np.log10(temp).T)
-    angles          = np.linspace(0,180,30)
-    mean_par        = np.mean(par)
-    mean_anti       = np.mean(anti)
-    ratio           = np.ma.masked_invalid(np.divide(par,anti))
-#    ratio[ratio > 1.4]     = 1.4
-#    ratio[ratio < 0.6]     = 0.6
-    
-    FS_time = dt.datetime.strftime(times[0],'%Y-%m-%d_%H%M')
-    Rects   = find_sign_intervals(times,bx)
-    ###########################################################################
-    #create the figure and axes
-    fig = plt.figure(figsize=(16,20))
-    #fig.autofmt_xdate()
-    
-    cbar_xloc = 0.925
-    cmap.jet.set_bad('k',alpha=1.0)    
-    cmap.bwr.set_bad('k',alpha=1.0) 
-    
-    ###########################################################################
-    #0th pane - spectrogram
-    ax0 = fig.add_subplot(611)
-    
-    #plot the data
-    spec_data = ax0.pcolormesh(times,energies,omni)#,cmap=cmap.bwr)
-    
-    #deal with epochs on the x-axis
-    time_format = mdates.DateFormatter('%H:%M')
-    minutes     = mdates.MinuteLocator(range(0,59),interval = 10,tz=None)
-    ax0.xaxis.set_major_locator(minutes)
-    ax0.xaxis.set_major_formatter(time_format)
-    ax0.set_xlabel('Time')
-    
-    #deal with the y-axis
-    ax0.set_yscale('log')
-    ax0.set_ylim([energies[0],energies[31]])
-    ax0.set_ylabel('Energy (eV)')
-    
-    #create the colorbar
-    max_exp       = np.ceil(np.max(omni))
-    min_exp       = np.floor(np.min(omni))
-    max_exp       = 8
-    min_exp       = 4
-    log_cbar_span = np.array(range(min_exp,max_exp))
-    cb_ax0        = fig.add_axes([cbar_xloc, 0.785714, 0.01, 0.114286])
-    spec_cbar     = fig.colorbar(spec_data,ticks=log_cbar_span,cax=cb_ax0)
-    cbar_span     = ['%1.1e' % val for val in 10**log_cbar_span]
-    cb_ax0.set_yticklabels(cbar_span)
-    
-    #put on a title
-    ax0.set_title('%s on %s' % (obs.upper(),FS_time))
-    
-    #add the spacecraft potential
-    #ax6 = ax0.twinx()
-    ax0.plot(times,sc_pot,'k-')
-    #ax6.set_ylim([0,20])
-    #ax6.set_ylabel('SC Potential (V)')
-    
-    ###########################################################################
-    #1st pane - low energy PAD
-    ax1 = fig.add_subplot(612)
-    
-    #plot the data
-    PAD_low_ax = ax1.pcolormesh(times,angles,low,cmap=cmap.bwr)
-    
-    #deal with epochs on the x-axis
-    time_format = mdates.DateFormatter('%H:%M')
-    minutes     = mdates.MinuteLocator(range(0,59),interval = 10,tz=None)
-    ax1.xaxis.set_major_locator(minutes)
-    ax1.xaxis.set_major_formatter(time_format)
-    ax1.set_xlabel('Time')
-    
-    #deal with the y-axis
-    ax1.set_yscale('linear')
-    ax1.set_ylim([0,180])
-    ax1.set_ylabel('Low Pitch Ang (deg)')
-    
-    #create the colorbar
-    max_exp       = np.ceil(np.max(low))
-    min_exp       = np.floor(np.min(low))
-    max_exp       = 6
-    min_exp       = 3
-    log_cbar_span = np.array(range(min_exp,max_exp))
-    cb_ax1        = fig.add_axes([cbar_xloc,0.648571,0.01,0.114286])
-    PAD_low_cbar  = fig.colorbar(PAD_low_ax,ticks=log_cbar_span,cax=cb_ax1)
-    cbar_span     = ['%1.1e' % val for val in 10**log_cbar_span]
-    cb_ax1.set_yticklabels(cbar_span)
-
-     
-    ###########################################################################
-    #2nd pane - mid energy PAD
-    ax2 = fig.add_subplot(613)
-    
-    #plot the data
-    PAD_mid_ax = ax2.pcolormesh(times,angles,mid,cmap=cmap.bwr)
-    
-    #deal with epochs on the x-axis
-    time_format = mdates.DateFormatter('%H:%M')
-    minutes     = mdates.MinuteLocator(range(0,59),interval = 10,tz=None)
-    ax2.xaxis.set_major_locator(minutes)
-    ax2.xaxis.set_major_formatter(time_format)
-    ax2.set_xlabel('Time')
-    
-    #deal with the y-axis
-    ax2.set_yscale('linear')
-    ax2.set_ylim([0,180])
-    ax2.set_ylabel('Mid Pitch Ang (deg)')
-    
-    #create the colorbar
-    max_exp       = np.ceil(np.max(mid))
-    min_exp       = np.floor(np.min(mid))
-    max_exp       = 6
-    min_exp       = 3
-    log_cbar_span = np.array(range(min_exp,max_exp))
-    cb_ax2        = fig.add_axes([cbar_xloc,0.511429,0.01,0.114286])
-    PAD_mid_cbar  = fig.colorbar(PAD_mid_ax,ticks=log_cbar_span,cax=cb_ax2)
-    cbar_span     = ['%1.1e' % val for val in 10**log_cbar_span]
-    cb_ax2.set_yticklabels(cbar_span)
-    
-
-    ###########################################################################
-    #3rd pane - high energy PAD
-    ax3 = fig.add_subplot(614)
-    
-    #plot the data
-    PAD_high_ax = ax3.pcolormesh(times,angles,high,cmap=cmap.bwr)
-    
-    #deal with epochs on the x-axis
-    time_format = mdates.DateFormatter('%H:%M')
-    minutes     = mdates.MinuteLocator(range(0,59),interval = 10,tz=None)
-    ax3.xaxis.set_major_locator(minutes)
-    ax3.xaxis.set_major_formatter(time_format)
-    ax3.set_xlabel('Time')
-    
-    #deal with the y-axis
-    ax3.set_yscale('linear')
-    ax3.set_ylim([0,180])
-    ax3.set_ylabel('Hi Pitch Ang (deg)')
-    
-    #create the colorbar
-    max_exp       = np.ceil(np.max(high))
-    min_exp       = np.floor(np.min(high))
-    max_exp       = 6
-    min_exp       = 3
-    log_cbar_span = np.array(range(min_exp,max_exp))
-    cb_ax3        = fig.add_axes([cbar_xloc,0.374286,0.01,0.114286])
-    PAD_high_cbar = fig.colorbar(PAD_high_ax,cax=cb_ax3,ticks=log_cbar_span)
-    cbar_span     = ['%1.1e' % val for val in 10**log_cbar_span]
-    cb_ax3.set_yticklabels(cbar_span)
-
-    ###########################################################################
-    #4th pane - ratio of PADs
-    ax4 = fig.add_subplot(615)
-    
-    #plot the data
-    asym_data = ax4.pcolormesh(times,energies,ratio,cmap=cmap.bwr)
-    #ax4.axhline(50.0,c='k')
-    for r in Rects:
-        start_x   = r[0]
-        start_y   = 50
-        width     = r[1]
-        thickness = 100
-        #ax4.add_patch(patches.Rectangle((start_x,start_y),width,thickness,color=r[2],alpha=0.5))
-    
-    #deal with epochs on the x-axis
-    time_format = mdates.DateFormatter('%H:%M')
-    minutes     = mdates.MinuteLocator(range(0,59),interval = 10,tz=None)
-    ax4.xaxis.set_major_locator(minutes)
-    ax4.xaxis.set_major_formatter(time_format)
-    ax4.set_xlabel('Time')
-    
-    #deal with the y-axis
-    ax4.set_yscale('log')
-    ax4.set_ylim([energies[0],energies[31]])
-    ax4.set_ylabel('Energy (eV)')
-    
-    #create the colorbar
-    max_ratio       = 2#int(np.ceil( np.max(ratio)))
-    min_ratio       = 0#int(np.floor(np.min(ratio)))
-    cbar_span       = np.asarray(range(min_ratio,max_ratio+1))
-    cb_ax4          = fig.add_axes([cbar_xloc,0.237143,0.01,0.114286])
-    asym_cbar       = fig.colorbar(asym_data,cax=cb_ax4)#ticks=cbar_span
-    #cb_ax4.set_yticklabels(cbar_span)
-
-    ###########################################################################
-    #5th pane - mag field
-    ax5 = fig.add_subplot(616)
-    
-    #plot the data
-    ax5.plot(times,bx*bnorm,label='Bx')
-    ax5.plot(times,by*bnorm,label='By')
-    ax5.plot(times,bz*bnorm,label='Bz')
-    
-    #deal with epochs on the x-axis
-    time_format = mdates.DateFormatter('%H:%M')
-    minutes     = mdates.MinuteLocator(range(0,59),interval = 10,tz=None)
-    ax5.xaxis.set_major_locator(minutes)
-    ax5.xaxis.set_major_formatter(time_format)
-    ax5.set_xlabel('Time')
-    
-    #deal with the y-axis
-    ax5.set_yscale('linear')
-    ax5.set_ylabel('Magnetic Field (nT)')
-    
-    ax5.legend(bbox_to_anchor=[1.12,1.0])
-    ###########################################################################
-    #save the file
-    
-    #fig.tight_layout()
-    filename = 'v:/fpishare/Conrad/PAD_plots/FS_summary_%s_%s.png' % (obs,FS_time)
-    print filename
-    fig.savefig(filename)
-    fig.clf()
-
+#  Summary Plots
 #####################################################################################
 def make_brst_summary_plot(obs,curr_debug):
     #unpack the CDF
@@ -526,9 +296,9 @@ def make_brst_summary_plot(obs,curr_debug):
     #create the colorbar
     log_cbar_span = np.array(range(min_exp,max_exp+1))
     cb_ax0        = fig.add_axes(cbar_position(ax0,cbar_off,cbar_wth))
-    spec_cbar     = fig.colorbar(spec_data,cax=cb_ax0,ticks=log_cbar_span)
-    cbar_span     = ['%1.0e' % val for val in 10.0**log_cbar_span]
-    cb_ax0.set_yticklabels(cbar_span)
+    spec_cbar     = fig.colorbar(spec_data,cax=cb_ax0,ticks=log_cbar_span,format=ticker.FormatStrFormatter('$10^{%d}$'))
+    #cbar_span     = ['%1.0e' % val for val in 10.0**log_cbar_span]
+    #cb_ax0.set_yticklabels(cbar_span)
     
     #put on a title
     ax0.set_title('%s on %s' % (obs.upper(),BRST_time))
@@ -537,12 +307,12 @@ def make_brst_summary_plot(obs,curr_debug):
     
     ###########################################################################
     #1st pane - low energy PAD
-    min_exp = 4
-    max_exp = 8
+    min_exp = int(np.floor(np.min(low)))
+    max_exp = int(np.ceil(np.max(low)))
     ax1 = fig.add_subplot(612)
     
     #plot the data
-    PAD_low_dat = ax1.pcolormesh(times,angles,low,cmap=cmap.bwr)
+    PAD_low_dat = ax1.pcolormesh(times,angles,low,cmap=cmap.bwr,vmin=min_exp,vmax=max_exp)
     
     #deal with epochs on the x-axis
     time_format = mdates.DateFormatter('%H:%M')
@@ -559,15 +329,15 @@ def make_brst_summary_plot(obs,curr_debug):
     #create the colorbar
     log_cbar_span = np.array(range(min_exp,max_exp+1))
     cb_ax1        = fig.add_axes(cbar_position(ax1,cbar_off,cbar_wth))
-    PAD_low_cbar  = fig.colorbar(PAD_low_dat,cax=cb_ax1,ticks=log_cbar_span)
-    cbar_span     = ['%1.0e' % val for val in 10**log_cbar_span]
-    cb_ax1.set_yticklabels(cbar_span)
+    PAD_low_cbar  = fig.colorbar(PAD_low_dat,cax=cb_ax1,ticks=log_cbar_span,format=ticker.FormatStrFormatter('$10^{%d}$'))
+    #cbar_span     = ['%1.0e' % val for val in 10**log_cbar_span]
+    #cb_ax1.set_yticklabels(cbar_span)
 
      
     ###########################################################################
     #2nd pane - mid energy PAD
-    min_exp       = 4
-    max_exp       = 8    
+    min_exp = int(np.floor(np.min(mid)))
+    max_exp = int(np.ceil(np.max(mid))) 
     ax2 = fig.add_subplot(613)
     
     #plot the data
@@ -588,15 +358,15 @@ def make_brst_summary_plot(obs,curr_debug):
     #create the colorbar
     log_cbar_span = np.array(range(min_exp,max_exp+1))
     cb_ax2        = fig.add_axes(cbar_position(ax2,cbar_off,cbar_wth))
-    PAD_mid_cbar  = fig.colorbar(PAD_mid_dat,ticks=log_cbar_span,cax=cb_ax2)
-    cbar_span     = ['%1.0e' % val for val in 10**log_cbar_span]
-    cb_ax2.set_yticklabels(cbar_span)
+    PAD_mid_cbar  = fig.colorbar(PAD_mid_dat,cax=cb_ax2,ticks=log_cbar_span,format=ticker.FormatStrFormatter('$10^{%d}$'))
+    #cbar_span     = ['%1.0e' % val for val in 10**log_cbar_span]
+    #cb_ax2.set_yticklabels(cbar_span)
     
 
     ###########################################################################
     #3rd pane - high energy PAD
-    min_exp       = 4
-    max_exp       = 8
+    min_exp = int(np.floor(np.min(high)))
+    max_exp = int(np.ceil(np.max(high))) 
     ax3 = fig.add_subplot(614)
     
     #plot the data
@@ -617,9 +387,9 @@ def make_brst_summary_plot(obs,curr_debug):
     #create the colorbar
     log_cbar_span = np.array(range(min_exp,max_exp+1))
     cb_ax3        = fig.add_axes(cbar_position(ax3,cbar_off,cbar_wth))
-    PAD_high_cbar = fig.colorbar(PAD_high_dat,cax=cb_ax3,ticks=log_cbar_span)
-    cbar_span     = ['%1.0e' % val for val in 10**log_cbar_span]
-    cb_ax3.set_yticklabels(cbar_span)
+    PAD_high_cbar = fig.colorbar(PAD_high_dat,cax=cb_ax3,ticks=log_cbar_span,format=ticker.FormatStrFormatter('$10^{%d}$'))
+    #cbar_span     = ['%1.0e' % val for val in 10**log_cbar_span]
+    #cb_ax3.set_yticklabels(cbar_span)
 
     ###########################################################################
     #4th pane - ratio of PADs
@@ -670,6 +440,214 @@ def make_brst_summary_plot(obs,curr_debug):
     
     #fig.tight_layout()
     filename = 'x:/fpishare/Conrad/PAD_plots/BRST_summary_%s_%s.png' % (obs,BRST_time)
+    fig.savefig(filename)
+    fig.clf()
+
+#####################################################################################
+def make_fast_summary_plot(obs,curr_debug):
+    #unpack the CDF
+    times           = np.asarray(curr_debug['Epoch'])
+    energies        = np.asarray(curr_debug['%s_des_energy_fast' % obs])[0,:]
+    sc_pot          = np.asarray(curr_debug['%s_des_scpot_mean_fast' % obs])
+    bx              = np.asarray(curr_debug['%s_des_bentPipeB_X_DSC' % obs])
+    by              = np.asarray(curr_debug['%s_des_bentPipeB_Y_DSC' % obs])
+    bz              = np.asarray(curr_debug['%s_des_bentPipeB_Z_DSC' % obs])
+    bnorm           = np.asarray(curr_debug['%s_des_bentPipeB_Norm' % obs])
+    par             = np.asarray(curr_debug['%s_des_energyspectr_par_fast' % obs]).T
+    anti            = np.asarray(curr_debug['%s_des_energyspectr_anti_fast' % obs]).T
+    temp            = np.asarray(curr_debug['%s_des_energyspectr_omni_fast' % obs])
+    omni            = np.ma.masked_invalid(np.log10(temp).T)
+    temp            = np.asarray(curr_debug['%s_des_pitchangdist_lowen_fast' % obs])
+    low             = np.ma.masked_invalid(np.log10(temp).T)
+    temp            = np.asarray(curr_debug['%s_des_pitchangdist_miden_fast' % obs])
+    mid             = np.ma.masked_invalid(np.log10(temp).T)
+    temp            = np.asarray(curr_debug['%s_des_pitchangdist_highen_fast' % obs])
+    high            = np.ma.masked_invalid(np.log10(temp).T)
+    angles          = np.linspace(0,180,30)
+    mean_par        = np.mean(par)
+    mean_anti       = np.mean(anti)
+    ratio           = np.ma.masked_invalid(np.divide(par,anti))
+    
+    FAST_time = dt.datetime.strftime(times[0],'%Y-%m-%d_%H%M')
+    
+    ###########################################################################
+    #create the figure and axes
+    fig = plt.figure(figsize=(16,20))
+    #fig.autofmt_xdate()
+    
+    cbar_off = 0.01
+    cbar_wth = 0.01
+    cmap.jet.set_bad('k',alpha=1.0)    
+    cmap.bwr.set_bad('k',alpha=1.0)    
+    
+    ###########################################################################
+    #0th pane - spectrogram
+    min_exp = 4
+    max_exp = 8
+    ax0     = fig.add_subplot(611)
+    
+    #plot the data
+    spec_data = ax0.pcolormesh(times,energies,omni,cmap=cmap.jet,vmin=max_exp,vmax=min_exp)
+    
+    #deal with epochs on the x-axis
+    time_format = mdates.DateFormatter('%H:%M')
+    minutes     = mdates.MinuteLocator(range(0,59),interval = 10,tz=None)
+    ax0.xaxis.set_major_locator(minutes)
+    ax0.xaxis.set_major_formatter(time_format)
+    ax0.set_xlabel('Time')
+    
+    #deal with the y-axis
+    ax0.set_yscale('log')
+    ax0.set_ylim([energies[0],energies[31]])
+    ax0.set_ylabel('Energy (eV)')
+    
+    #create the colorbar
+    log_cbar_span = np.array(range(min_exp,max_exp+1))
+    cb_ax0        = fig.add_axes(cbar_position(ax0,cbar_off,cbar_wth))
+    spec_cbar     = fig.colorbar(spec_data,cax=cb_ax0,ticks=log_cbar_span,format=ticker.FormatStrFormatter('$10^{%d}$'))
+    #cbar_span     = ['%1.0e' % val for val in 10.0**log_cbar_span]
+    #cb_ax0.set_yticklabels(cbar_span)
+    
+    #put on a title
+    ax0.set_title('%s on %s' % (obs.upper(),FAST_time))
+    
+    ax0.plot(times,sc_pot,'k-')
+    
+    ###########################################################################
+    #1st pane - low energy PAD
+    min_exp = int(np.floor(np.min(low)))
+    max_exp = int(np.ceil(np.max(low)))
+    ax1 = fig.add_subplot(612)
+    
+    #plot the data
+    PAD_low_dat = ax1.pcolormesh(times,angles,low,cmap=cmap.bwr,vmin=min_exp,vmax=max_exp)
+    
+    #deal with epochs on the x-axis
+    time_format = mdates.DateFormatter('%H:%M')
+    minutes     = mdates.MinuteLocator(range(0,59),interval = 10,tz=None)
+    ax1.xaxis.set_major_locator(minutes)
+    ax1.xaxis.set_major_formatter(time_format)
+    ax1.set_xlabel('Time')
+    
+    #deal with the y-axis
+    ax1.set_yscale('linear')
+    ax1.set_ylim([0,180])
+    ax1.set_ylabel('Low Pitch Ang (deg)')
+    
+    #create the colorbar
+    log_cbar_span = np.array(range(min_exp,max_exp+1))
+    cb_ax1        = fig.add_axes(cbar_position(ax1,cbar_off,cbar_wth))
+    PAD_low_cbar  = fig.colorbar(PAD_low_dat,cax=cb_ax1,ticks=log_cbar_span,format=ticker.FormatStrFormatter('$10^{%d}$'))
+    #cbar_span     = ['%1.0e' % val for val in 10**log_cbar_span]
+    #cb_ax1.set_yticklabels(cbar_span)
+
+     
+    ###########################################################################
+    #2nd pane - mid energy PAD
+    min_exp = int(np.floor(np.min(mid)))
+    max_exp = int(np.ceil(np.max(mid))) 
+    ax2 = fig.add_subplot(613)
+    
+    #plot the data
+    PAD_mid_dat = ax2.pcolormesh(times,angles,mid,cmap=cmap.bwr)
+    
+    #deal with epochs on the x-axis
+    time_format = mdates.DateFormatter('%H:%M')
+    minutes     = mdates.MinuteLocator(range(0,59),interval = 10,tz=None)
+    ax2.xaxis.set_major_locator(minutes)
+    ax2.xaxis.set_major_formatter(time_format)
+    ax2.set_xlabel('Time')
+    
+    #deal with the y-axis
+    ax2.set_yscale('linear')
+    ax2.set_ylim([0,180])
+    ax2.set_ylabel('Mid Pitch Ang (deg)')
+    
+    #create the colorbar
+    log_cbar_span = np.array(range(min_exp,max_exp+1))
+    cb_ax2        = fig.add_axes(cbar_position(ax2,cbar_off,cbar_wth))
+    PAD_mid_cbar  = fig.colorbar(PAD_mid_dat,cax=cb_ax2,ticks=log_cbar_span,format=ticker.FormatStrFormatter('$10^{%d}$'))
+    #cbar_span     = ['%1.0e' % val for val in 10**log_cbar_span]
+    #cb_ax2.set_yticklabels(cbar_span)
+    
+
+    ###########################################################################
+    #3rd pane - high energy PAD
+    min_exp = int(np.floor(np.min(high)))
+    max_exp = int(np.ceil(np.max(high))) 
+    ax3 = fig.add_subplot(614)
+    
+    #plot the data
+    PAD_high_dat = ax3.pcolormesh(times,angles,high,cmap=cmap.bwr)
+    
+    #deal with epochs on the x-axis
+    time_format = mdates.DateFormatter('%H:%M')
+    minutes     = mdates.MinuteLocator(range(0,59),interval = 10,tz=None)
+    ax3.xaxis.set_major_locator(minutes)
+    ax3.xaxis.set_major_formatter(time_format)
+    ax3.set_xlabel('Time')
+    
+    #deal with the y-axis
+    ax3.set_yscale('linear')
+    ax3.set_ylim([0,180])
+    ax3.set_ylabel('Hi Pitch Ang (deg)')
+    
+    #create the colorbar
+    log_cbar_span = np.array(range(min_exp,max_exp+1))
+    cb_ax3        = fig.add_axes(cbar_position(ax3,cbar_off,cbar_wth))
+    PAD_high_cbar = fig.colorbar(PAD_high_dat,cax=cb_ax3,ticks=log_cbar_span,format=ticker.FormatStrFormatter('$10^{%d}$'))
+    #cbar_span     = ['%1.0e' % val for val in 10**log_cbar_span]
+    #cb_ax3.set_yticklabels(cbar_span)
+
+    ###########################################################################
+    #4th pane - ratio of PADs
+    ax4 = fig.add_subplot(615)
+    
+    #plot the data
+    asym_data = ax4.pcolormesh(times,energies,ratio,cmap=cmap.bwr,vmin=0.6,vmax=1.4)
+    
+    #deal with epochs on the x-axis
+    time_format = mdates.DateFormatter('%H:%M')
+    minutes     = mdates.MinuteLocator(range(0,59),interval = 10,tz=None)
+    ax4.xaxis.set_major_locator(minutes)
+    ax4.xaxis.set_major_formatter(time_format)
+    ax4.set_xlabel('Time')
+    
+    #deal with the y-axis
+    ax4.set_yscale('log')
+    ax4.set_ylim([energies[0],energies[31]])
+    ax4.set_ylabel('Energy (eV)')
+    
+    #create the colorbar
+    cb_ax4          = fig.add_axes(cbar_position(ax4,cbar_off,cbar_wth))
+    asym_cbar       = fig.colorbar(asym_data,cax=cb_ax4)
+
+    ###########################################################################
+    #5th pane - mag field
+    ax5 = fig.add_subplot(616)
+    
+    #plot the data
+    ax5.plot(times,bx*bnorm,label='Bx')
+    ax5.plot(times,by*bnorm,label='By')
+    ax5.plot(times,bz*bnorm,label='Bz')
+    
+    #deal with epochs on the x-axis
+    time_format = mdates.DateFormatter('%H:%M')
+    minutes     = mdates.MinuteLocator(range(0,59),interval = 10,tz=None)
+    ax5.xaxis.set_major_locator(minutes)
+    ax5.xaxis.set_major_formatter(time_format)
+    ax5.set_xlabel('Time')
+    
+    #deal with the y-axis
+    ax5.set_yscale('linear')
+    ax5.set_ylabel('Magnetic Field (nT)')
+    
+    ax5.legend(bbox_to_anchor=[1.12,1.0])
+    ###########################################################################
+    #save the file
+    
+    #fig.tight_layout()
+    filename = 'x:/fpishare/Conrad/PAD_plots/FAST_summary_%s_%s.png' % (obs,FAST_time)
     fig.savefig(filename)
     fig.clf()
     
