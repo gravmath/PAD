@@ -1,10 +1,14 @@
+# -*- coding: utf-8 -*-
 import datetime           as dt
 import matplotlib.cm      as cmap
 import matplotlib.dates   as mdates
-import matplotlib.patches as patches
+#import matplotlib.patches as patches
 import matplotlib.pyplot  as plt
 import matplotlib.ticker  as ticker
 import numpy              as np
+
+import Convert
+import PAD
 
     
 ###############################################################################    
@@ -26,9 +30,11 @@ def create_flux_survey_spectrum(time_label,time_range_str,filepath,core_data):
         minPA      = i*20.0
         maxPA      = (i+1)*20.0
         
+        sterads    = PAD.compute_spherical_cap_area(minPA,maxPA)
+        
         row        = int(np.floor(i/3))
         col        = i%3
-        Edata, FAC = compute_limited_PAD(time_label,minE,maxE,minPA,maxPA,core_data)
+        Edata, FAC = PAD.compute_limited_PAD(time_label,minE,maxE,minPA,maxPA,core_data)
         axes[row][col].loglog(Edata,FAC/sterads,'r-',linewidth = 3.0)
         axes[row][col].loglog(Edata,omni,'b-')
         axes[row][col].set_xlim([1e1,1e5])
@@ -58,8 +64,8 @@ def create_flux_survey_spectrum(time_label,time_range_str,filepath,core_data):
 def create_smooth_survey_PAD_plot(time_label,time_range_str,filepath,core_data):
     fig1         = plt.figure(figsize=(10,20))
     ax           = fig1.add_subplot(111)
-    pitch_angles = calculate_pitch_angles(core_data['v_dirs'],core_data['bfield'],time_label)
-    cols         = list(reversed((cm.rainbow(np.linspace(0,1,32)))))
+    pitch_angles = PAD.compute_pitch_angles(core_data['v_dirs'],core_data['bfield'],time_label)
+    cols         = list(reversed((cmap.rainbow(np.linspace(0,1,32)))))
     poly_deg     = 2
     jN_LM        = calculate_flux_LM(time_label,core_data)
     ELow         = 0
@@ -84,10 +90,10 @@ def create_smooth_survey_PAD_plot(time_label,time_range_str,filepath,core_data):
 def create_raw_survey_PAD_plot(time_label,Elow,Ehigh,time_range_str,filepath,core_data):
     fig1                   = plt.figure(figsize=(10,20))
     ax                     = fig1.add_subplot(111)
-    pitch_angles           = calculate_pitch_angles(core_data['v_dirs'],core_data['bfield'],time_label)
+    pitch_angles           = PAD.compute_pitch_angles(core_data['v_dirs'],core_data['bfield'],time_label)
     flat_pitch_angles      = np.ndarray.flatten(pitch_angles)
     n_energies             = Ehigh - Elow + 1
-    cols                   = list(reversed((cm.rainbow(np.linspace(0,1,n_energies)))))
+    cols                   = list(reversed((cmap.rainbow(np.linspace(0,1,n_energies)))))
     for energy_label in range(Elow,Ehigh):
         flat_particle_flux = np.ndarray.flatten(core_data['jN'][time_label,:,:,energy_label])  
         plt.semilogy(flat_pitch_angles,flat_particle_flux,color=cols[energy_label],marker='.',linewidth=0.0,label = "%2.2f eV" % (core_data['parms']['Erg'][energy_label]) )
@@ -108,7 +114,7 @@ def create_raw_survey_PAD_plot(time_label,Elow,Ehigh,time_range_str,filepath,cor
 ###############################################################################
 def calculate_flux_LM(time_label,core_data):
     B          = core_data['bfield'][time_label,0:3]
-    T          = convert_to_LM(B)
+    T          = Convert.convert_to_LM(B)
     num_pixels = len(core_data['parms']['Phi'])*len(core_data['parms']['Theta'])
     num_ergs   = len(core_data['parms']['Erg'])
     
@@ -130,7 +136,7 @@ def create_raw_survey_PAD_plot_LM(time_label,Elow,Ehigh,time_range_str,filepath,
     jN_LM = calculate_flux_LM(time_label,core_data)
     fig1  = plt.figure(figsize=(10,20))
     ax    = fig1.add_subplot(111) 
-    cols                   = list(reversed((cm.rainbow(np.linspace(0,1,32)))))
+    cols                   = list(reversed((cmap.rainbow(np.linspace(0,1,32)))))
     for e in range(Elow,Ehigh):
         plt.semilogy(jN_LM[:,0,e],jN_LM[:,2,e],color=cols[e],marker='.',linewidth=0.0,label = "%2.2f eV" % (core_data['parms']['Erg'][e]) )    
     plt.xlabel('Pitch angle (deg)',fontsize=14)
@@ -189,17 +195,7 @@ def visualize_FPI_pixels_in_LM(time_label,time_range_str,filepath,core_data):
     plt.close()
     
 
-#####################################################################################
-def compute_fill_val(array):
-    
-    if np.max(array) > 0.0:
-        fill_val = np.max(array)
-    else:
-        fill_val = 1.0
-        
-    return fill_val
-
-#####################################################################################
+####################################################################################
 def find_sign_intervals(times,signal):
     curr_index = 0
     curr_sign  = np.sign(signal[0])
@@ -256,8 +252,6 @@ def make_brst_summary_plot(obs,curr_debug):
     temp            = np.asarray(curr_debug['%s_des_pitchangdist_highen_brst' % obs])
     high            = np.ma.masked_invalid(np.log10(temp).T)
     angles          = np.linspace(0,180,30)
-    mean_par        = np.mean(par)
-    mean_anti       = np.mean(anti)
     ratio           = np.ma.masked_invalid(np.divide(par,anti))
     
     BRST_time = dt.datetime.strftime(times[0],'%Y-%m-%d_%H%M')
@@ -464,8 +458,6 @@ def make_fast_summary_plot(obs,curr_debug):
     temp            = np.asarray(curr_debug['%s_des_pitchangdist_highen_fast' % obs])
     high            = np.ma.masked_invalid(np.log10(temp).T)
     angles          = np.linspace(0,180,30)
-    mean_par        = np.mean(par)
-    mean_anti       = np.mean(anti)
     ratio           = np.ma.masked_invalid(np.divide(par,anti))
     
     FAST_time = dt.datetime.strftime(times[0],'%Y-%m-%d_%H%M')

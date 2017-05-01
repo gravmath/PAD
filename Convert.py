@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import numpy  as np
 import SunEph 
 import equation_of_time
@@ -5,6 +6,7 @@ import equation_of_time
 eclip_pole_GCI = np.array([0.0,-0.39777715575399,0.917482062146321])
 dipole_ECEF    = np.array([-0.05752247,0.17291892,-0.98325491])
 
+###############################################################################
 def convert_GCI_to_GSE(epoch_dict):
     S, V  = SunEph.CalcSun_Low(epoch_dict)
     X_hat = S/np.sqrt(S.dot(S))
@@ -13,14 +15,16 @@ def convert_GCI_to_GSE(epoch_dict):
     Z_hat = np.cross(X_hat,Y_hat)
     
     return np.vstack((X_hat,Y_hat,Z_hat))
-    
+
+###############################################################################    
 def convert_ECEF_to_GCI(epoch_dict):
     gha   = equation_of_time.calculate_GMST(epoch_dict)
     cos_g = np.cos(gha)
     sin_g = np.sin(gha)
     
     return np.array([[cos_g,-sin_g,0],[sin_g,cos_g,0],[0,0,1]])
-    
+
+###############################################################################    
 def convert_GSE_to_GSM(epoch_dict):
     A_gse_gci     = convert_GCI_to_GSE(epoch_dict)
     S, V          = SunEph.CalcSun_Low(epoch_dict)
@@ -46,6 +50,7 @@ def convert_GSE_to_GSM(epoch_dict):
 
     return np.array([[A00,A01,A02],[A10,A11,A12],[A20,A21,A22]])
 
+###############################################################################
 def convert_GSM_to_ECEF(epoch_dict):
     T_GCI_ECEF = convert_ECEF_to_GCI(epoch_dict)
     T_GSE_GCI  = convert_GCI_to_GSE(epoch_dict)
@@ -54,7 +59,8 @@ def convert_GSM_to_ECEF(epoch_dict):
     T_GSM_ECEF = T_GSM_GSE.dot(T_GSE_GCI.dot(T_GCI_ECEF))
     
     return T_GSM_ECEF.transpose()
-    
+
+###############################################################################    
 def convert_GCI_to_SM(epoch_dict):
     S, V  = SunEph.CalcSun_Low(epoch_dict)
     D     = convert_ECEF_to_GCI(epoch_dict).dot(dipole_ECEF)
@@ -64,6 +70,7 @@ def convert_GCI_to_SM(epoch_dict):
     X_hat = np.cross(Y_hat,Z_hat)
     return np.vstack((X_hat,Y_hat,Z_hat))    
 
+###############################################################################
 def convert_GCI_to_GSM(epoch_dict):
     return convert_GSE_to_GSM(epoch_dict).dot(convert_GCI_to_GSE(epoch_dict))
     
@@ -71,3 +78,15 @@ def calc_LT(V,x0_val=12):
     x, y, z = V
     LT = np.arctan2(y,x)*180/np.pi/15
     return (LT+x0_val) % 24    
+
+###############################################################################
+def convert_to_LM(B):
+    B_norm = np.sqrt(B.dot(B))
+    z_LM   =  B/B_norm
+    z_sc   = np.array([0,0,1])
+    x      = np.cross(z_sc,B)
+    x_norm = np.sqrt(x.dot(x))
+    x_LM   = x/x_norm
+    y_LM   = np.cross(z_LM,x_LM)
+    
+    return np.vstack((x_LM,y_LM,z_LM))   
