@@ -2,6 +2,8 @@
 import numpy                   as np
 import scipy                   as sp
 
+num_polar = 16
+num_az    = 32
 ###############################################################################
 ###############################################################################
 #  DISTRIBUTION DATA
@@ -41,7 +43,7 @@ def unpack_dist_cdf(cdf_dict,obs,mode,species,ver,corrections_on,correction_over
     if corrections_on == 0:
         corrected_dist   = uncorrected_dist
     else:
-        corrected_dist   = subtract_internal_photoelectrons(cdf_dict,uncorrected_dist,obs,species,correction_override)
+        corrected_dist   = subtract_internal_photoelectrons(cdf_dict,uncorrected_dist,obs,mode,species,correction_override)
     
     dist_data = {'Dist'   : corrected_dist,
                  'Err'    : np.asarray(dist_cdf[dist_err_str][:,:,:,:]),
@@ -66,7 +68,7 @@ def unpack_dist_cdf(cdf_dict,obs,mode,species,ver,corrections_on,correction_over
 #  and corrects it for internally-generated photoelectons 
 #
 ###############################################################################    
-def subtract_internal_photoelectrons(cdf_dict,raw_dist,obs,species,correction_override):
+def subtract_internal_photoelectrons(cdf_dict,raw_dist,obs,mode,species,correction_override):
     #allocate space for the corrected phase-space density data structure
     corrected_dist = np.zeros(raw_dist.shape)
     
@@ -87,7 +89,8 @@ def subtract_internal_photoelectrons(cdf_dict,raw_dist,obs,species,correction_ov
     print cdf_dict.keys(), n_photo
     
     #get the photoelectron model
-    f_photo = np.asarray(cdf_dict['photo']['mms_des_bgdist_fast'])
+    photo_mode_str = 'mms_des_bgdist_%s' % mode
+    f_photo = np.asarray(cdf_dict['photo'][photo_mode_str])
     
     #loop over all times
     for k in range(len(cdf_dict['dist']['Epoch'])):
@@ -231,20 +234,35 @@ def detect_DMPA_str(cdf_dict):
 # the particle velocity directions
 #
 ###############################################################################
-def compute_incoming_particle_directions(params):
-    num_az    = params['Phi'].shape[0]
-    num_polar = params['Theta'].shape[0]
-    deg       = sp.pi/180    
+def compute_incoming_particle_directions(mode,params):
 
-    v_dirs    = np.zeros((num_az,num_polar,3))
-    for i in range(num_az):
-        for j in range(num_polar):
-            phi         = params['Phi']  [i]*deg
-            theta       = params['Theta'][j]*deg
-            v_dirs[i,j] = [-sp.sin(theta)*sp.cos(phi),\
-                           -sp.sin(theta)*sp.sin(phi),\
-                           -sp.cos(theta)]
-            
+    deg       = sp.pi/180    
+    
+    #in fast mode, all particle directions are the same at the same
+    #time so only one 32x16 array is needed
+    if mode == 'fast':
+        v_dirs    = np.zeros((num_az,num_polar,3))
+        for i in range(num_az):
+            for j in range(num_polar):
+                phi         = params['Phi']  [i]*deg
+                theta       = params['Theta'][j]*deg
+                v_dirs[i,j] = [-sp.sin(theta)*sp.cos(phi),\
+                               -sp.sin(theta)*sp.sin(phi),\
+                               -sp.cos(theta)]
+    #in brst mode, the despinning can't be done completely so the 
+    #phi is record varying
+    if mode == 'brst':
+        num_time  = params['Phi'].shape[0]
+        v_dirs    = np.zeros((num_time,num_az,num_polar,3))
+        for k in range(num_time):
+            for i in range(num_az):
+                for j in range(num_polar):
+                    phi           = params['Phi'][k][i]*deg
+                    theta         = params['Theta'] [j]*deg
+                    v_dirs[k,i,j] = [-sp.sin(theta)*sp.cos(phi),\
+                                     -sp.sin(theta)*sp.sin(phi),\
+                                     -sp.cos(theta)]
+                        
     return v_dirs
 	
 ###############################################################################    
@@ -254,23 +272,28 @@ def compute_incoming_particle_directions(params):
 # pixel
 #
 ###############################################################################
-def compute_pitch_angles(v_dirs,bfield,time_label):
+def compute_pitch_angles(mode,v_dirs,bfield,time_label):
     #Construct the B field unit vector at chosen time
     Bx = bfield[time_label,0]
     By = bfield[time_label,1]
     Bz = bfield[time_label,2]
+    pitch_angles = np.zeros(num_az,num_polar)
     
-    pitch_angles = np.zeros(v_dirs.shape[0:2])
-    
-    for i in range(0,v_dirs.shape[0]):
-        for j in range(0,v_dirs.shape[1]):
-            U                 = v_dirs[i,j]
+    if mode == 'fast':
+        v = v_dirs[:,:]
+    if mode == 'brst':
+        v = v_dirs[time_label,:,:]
+       
+    for i in range(num_az):
+        for j in range(num_polar):
+            U                 = v[i,j]
             dot_prod          = U[0]*Bx + U[1]*By + U[2]*Bz
             if np.abs(dot_prod) > 1.0:
                 if np.abs(dot_prod) > 1.001:
                     print "dot prod. 'tween vel and B was %.3e different from 1.0" % (dot_prod - np.sign(dot_prod)*1.0)
                 dot_prod = 0.999*dot_prod
             pitch_angles[i,j] = sp.arccos(dot_prod)*180/sp.pi
+    
 
     return pitch_angles
 
@@ -406,20 +429,20 @@ def spherical_cap_area(theta):
 ###############################################################################
 def load_particle_data(cdf_dict,obs,mode,species,ver,corrections_on,correction_override = 0,source="DEBUG"):
     
-    dist, parms         = unpack_dist_cdf(cdf_dict,obs,mode,species,ver,corrections_on,correction_override)
+    dist_data, parms    = unpack_dist_cdf(cdf_dict,obs,mode,species,ver,corrections_on,correction_override)
     bfield              = fetch_magnetic_field(cdf_dict,obs,species,source)
     v_dirs              = compute_incoming_particle_directions(parms)
-    counts              = compute_counts(dist)
-    jN                  = compute_number_flux(dist,parms)
-    jN_err              = compute_number_flux_errors(dist,parms)
+    counts              = compute_counts(dist_data)
+    jN                  = compute_number_flux(dist_data,parms)
+    jN_err              = compute_number_flux_errors(dist_data,parms)
     
-    core_data           = {}
-    core_data['dist']   = dist
-    core_data['parms']  = parms
-    core_data['bfield'] = bfield
-    core_data['v_dirs'] = v_dirs
-    core_data['counts'] = counts
-    core_data['jN']     = jN
-    core_data['jN_err'] = jN_err
+    core_data                = {}
+    core_data['dist_data']   = dist_data
+    core_data['parms']       = parms
+    core_data['bfield']      = bfield
+    core_data['v_dirs']      = v_dirs
+    core_data['counts']      = counts
+    core_data['jN']          = jN
+    core_data['jN_err']      = jN_err
     
     return core_data    
