@@ -1,44 +1,20 @@
 # -*- coding: utf-8 -*-
-import Tkinter as Tk
+import spacepy.pycdf as pycdf
 import sys
-sys.path.append('c:/users/cschiff/Documents/GitHub/PAD')
-import Grapher
+sys.path.append('c:/users/cschiff/Documents/GitHub/PAD/')
+#import Grapher
+import PAD
 
-###############################################################################
-# Widgets go here
-###############################################################################
-#create the root window
-root = Tk.Tk()
-Debug_filename           = Tk.StringVar()
-Dist_filename            = Tk.StringVar()
-Photocorrection_filename = Tk.StringVar()
-Observatory              = Tk.StringVar()
-Species_type             = Tk.StringVar()
-CDF_Ver                  = Tk.StringVar()
-Corrections_on_flag      = Tk.StringVar()
-Corrections_override_val = Tk.StringVar()
+debug_filename = 'C:\Yuggoth\BBF\mms1_fpi_brst_l2_des-debug_20160809092044_v3.1.1.cdf'.replace('\\','/')
+dist_filename  = 'C:\Yuggoth\BBF\mms1_fpi_brst_l2_des-dist_20160809092044_v3.1.1.cdf'.replace('\\','/')
+photo_filename = 'C:\Yuggoth\Photoelectron Model\mms_fpi_brst_l2_des-bgdist_v1.1.0_p0-2.cdf'.replace('\\','/')
 
-#specify some of the root characteristics
-root.title("PAD Explorer")
-root.geometry("1050x260")
-
-
-########################################
-#  Frame the variables
-########################################
-#Now define a frame to hold most everything else
-all_frame = Tk.Frame(root)
-all_frame.configure(width = 980,bd=1,relief='raised')
-all_frame.grid(row = 1, column = 0)
-
-#### 0th row
-####
-
-#Debug Filename
-debug_fname_lab = Tk.Label(all_frame,text = 'Debug Filename')
-debug_fname_lab.grid(row = 1, column = 0, sticky = 'W')
-debug_fname_entry = Tk.Entry(all_frame,textvariable=Debug_filename)
-debug_fname_entry.configure(state='normal',width = 80,justify='left')
-debug_fname_entry.grid(row = 1, column = 1, sticky = 'W')
-
-root.mainloop() 
+cdf_dict       = {'debug' : pycdf.CDF(debug_filename),
+                  'dist'  : pycdf.CDF(dist_filename),
+                  'photo' : pycdf.CDF(photo_filename)}
+obs            = 'mms1'
+mode           = 'brst'
+species        = 'des'
+ver            = 'ver3'
+corrections_on = 1
+core_data      = PAD.load_particle_data(cdf_dict,obs,mode,species,ver,corrections_on)

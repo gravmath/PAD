@@ -27,14 +27,14 @@ import scipy                   as sp
 #            Theta - instrument look direction polar angles
 #
 ###############################################################################
-def unpack_dist_CDF(cdf_dict,obs,species,ver,type,corrections_on,correction_override=0.0):
+def unpack_dist_cdf(cdf_dict,obs,mode,species,ver,corrections_on,correction_override=0.0):
     dist_cdf       = cdf_dict['dist']
-    dist_str       = '%s_%s_dist_%s'       % (obs,species,type)
-    dist_err_str   = '%s_%s_disterr_%s'    % (obs,species,type)
-    energy_str     = '%s_%s_energy_%s'     % (obs,species,type)
-    error_flag_str = '%s_%s_errorflags_%s' % (obs,species,type)
-    phi_str        = '%s_%s_phi_%s'        % (obs,species,type)
-    theta_str      = '%s_%s_theta_%s'      % (obs,species,type)
+    dist_str       = '%s_%s_dist_%s'       % (obs,species,mode)
+    dist_err_str   = '%s_%s_disterr_%s'    % (obs,species,mode)
+    energy_str     = '%s_%s_energy_%s'     % (obs,species,mode)
+    error_flag_str = '%s_%s_errorflags_%s' % (obs,species,mode)
+    phi_str        = '%s_%s_phi_%s'        % (obs,species,mode)
+    theta_str      = '%s_%s_theta_%s'      % (obs,species,mode)
 
     uncorrected_dist = np.asarray(dist_cdf[dist_str][:,:,:,:])
     
@@ -66,22 +66,22 @@ def unpack_dist_CDF(cdf_dict,obs,species,ver,type,corrections_on,correction_over
 #  and corrects it for internally-generated photoelectons 
 #
 ###############################################################################    
-def subtract_internal_photoelectrons(cdf_dict,raw_Dist,obs,species,correction_override):
+def subtract_internal_photoelectrons(cdf_dict,raw_dist,obs,species,correction_override):
     #allocate space for the corrected phase-space density data structure
-    corrected_Dist = np.zeros(raw_Dist.shape)
+    corrected_dist = np.zeros(raw_dist.shape)
     
     #construct startdelphi_count_str
     start_delphi_count_str = '%s_%s_startdelphi_count_fast' % (obs,species)
     
     #pull out n_photo - the structure of the following line is understood 
-    #by noting that cdf_dict['moms'] gives the moments file and 
+    #by noting that cdf_dict['debug'] gives the moments file and 
     #.attrs['Photoelectron_model_scaling_factor'][0] get the attributes 
     #(attrs) returned as a dictionary from which the key 
     #'Photoelectron_model_scaling_factor' gives the value in some 
     #spacepy/CDF way whose 0th component is a string which is then
     #case to float (whew!!!)
     if correction_override == 0:
-        n_photo = float(cdf_dict['moms'].attrs['Photoelectron_model_scaling_factor'][0])
+        n_photo = float(cdf_dict['debug'].attrs['Photoelectron_model_scaling_factor'][0])
     else:
         n_photo = correction_override
     print cdf_dict.keys(), n_photo
@@ -98,13 +98,13 @@ def subtract_internal_photoelectrons(cdf_dict,raw_Dist,obs,species,correction_ov
         correction_index        = int(np.floor(startdelphi_index/16.0))
         
         #subtract off the correction
-        corrected_Dist[k,:,:,:] = raw_Dist[k,:,:,:] - n_photo*f_photo[correction_index,:,:,:]
+        corrected_dist[k,:,:,:] = raw_dist[k,:,:,:] - n_photo*f_photo[correction_index,:,:,:]
         
     #floor the negative values at zero
-    corrected_Dist[corrected_Dist < 0.0 ] = 0.0
+    corrected_dist[corrected_dist < 0.0 ] = 0.0
 
     #return results    
-    return corrected_Dist
+    return corrected_dist
     
 
 ###############################################################################
@@ -133,10 +133,10 @@ def fetch_magnetic_field(cdf_dict,obs,species,source="DEBUG"):
     B_str  = '%s_%s_bentPipeB_Norm'        % (obs,species)  
     
     if source == "DEBUG":
-        Bx     = np.asarray(cdf_dict['bfield'][Bx_str])
-        By     = np.asarray(cdf_dict['bfield'][By_str])
-        Bz     = np.asarray(cdf_dict['bfield'][Bz_str])
-        B      = np.asarray(cdf_dict['bfield'][B_str])
+        Bx     = np.asarray(cdf_dict['debug'][Bx_str])
+        By     = np.asarray(cdf_dict['debug'][By_str])
+        Bz     = np.asarray(cdf_dict['debug'][Bz_str])
+        B      = np.asarray(cdf_dict['debug'][B_str])
         B_field = np.vstack((Bx,By,Bz,B)).transpose()
     if source == "AFG":
         B_field = fetch_AFG_B_field(cdf_dict,species)
@@ -404,9 +404,9 @@ def spherical_cap_area(theta):
 #  numpy arrays
 #
 ###############################################################################
-def load_particle_data(cdf_dict,obs,species,ver,corrections_on,correction_override = 0,source="DEBUG"):
+def load_particle_data(cdf_dict,obs,mode,species,ver,corrections_on,correction_override = 0,source="DEBUG"):
     
-    dist, parms         = unpack_dist_cdf(cdf_dict,obs,species,ver,corrections_on,correction_override)
+    dist, parms         = unpack_dist_cdf(cdf_dict,obs,mode,species,ver,corrections_on,correction_override)
     bfield              = fetch_magnetic_field(cdf_dict,obs,species,source)
     v_dirs              = compute_incoming_particle_directions(parms)
     counts              = compute_counts(dist)
