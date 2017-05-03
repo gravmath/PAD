@@ -277,7 +277,7 @@ def compute_pitch_angles(mode,v_dirs,bfield,time_label):
     Bx = bfield[time_label,0]
     By = bfield[time_label,1]
     Bz = bfield[time_label,2]
-    pitch_angles = np.zeros(num_az,num_polar)
+    pitch_angles = np.zeros((num_az,num_polar))
     
     if mode == 'fast':
         v = v_dirs[:,:]
@@ -365,12 +365,12 @@ def compute_omni_number_flux(jN,time_label,energy_label):
 # angle from the full data
 #
 ###############################################################################
-def compute_limited_PAD(time_label,minE,maxE,minPA,maxPA,core_data):
+def compute_limited_PAD(mode,time_label,minE,maxE,minPA,maxPA,core_data):
     #find the truncated energy range
     Edata                     = core_data['parms']['Erg'][minE:maxE]
     
     #get the pitch angles and then flatten to a 1-D array
-    pitch_angles              = compute_pitch_angles(core_data['v_dirs'],core_data['bfield'],time_label)
+    pitch_angles              = compute_pitch_angles(mode,core_data['v_dirs'],core_data['bfield'],time_label)
     flat_PA                   = np.ndarray.flatten(pitch_angles)
     
     sub_PAD                   = np.zeros(len(range(minE,maxE)))
@@ -431,7 +431,7 @@ def load_particle_data(cdf_dict,obs,mode,species,ver,corrections_on,correction_o
     
     dist_data, parms    = unpack_dist_cdf(cdf_dict,obs,mode,species,ver,corrections_on,correction_override)
     bfield              = fetch_magnetic_field(cdf_dict,obs,species,source)
-    v_dirs              = compute_incoming_particle_directions(parms)
+    v_dirs              = compute_incoming_particle_directions(mode,parms)
     counts              = compute_counts(dist_data)
     jN                  = compute_number_flux(dist_data,parms)
     jN_err              = compute_number_flux_errors(dist_data,parms)

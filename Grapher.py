@@ -12,7 +12,7 @@ import PAD
 
     
 ###############################################################################    
-def create_flux_survey_spectrum(time_label,time_range_str,filepath,core_data):
+def create_flux_survey_spectrum(mode,time_label,time_range_str,filepath,core_data):
     minE       = 0
     maxE       = 32
     jN         = core_data['jN']
@@ -34,7 +34,7 @@ def create_flux_survey_spectrum(time_label,time_range_str,filepath,core_data):
         
         row        = int(np.floor(i/3))
         col        = i%3
-        Edata, FAC = PAD.compute_limited_PAD(time_label,minE,maxE,minPA,maxPA,core_data)
+        Edata, FAC = PAD.compute_limited_PAD(mode,time_label,minE,maxE,minPA,maxPA,core_data)
         axes[row][col].loglog(Edata,FAC/sterads,'r-',linewidth = 3.0)
         axes[row][col].loglog(Edata,omni,'b-')
         axes[row][col].set_xlim([1e1,1e5])
@@ -90,7 +90,7 @@ def create_smooth_survey_PAD_plot(time_label,time_range_str,filepath,core_data):
 def create_raw_survey_PAD_plot(time_label,Elow,Ehigh,time_range_str,filepath,core_data):
     fig1                   = plt.figure(figsize=(10,20))
     ax                     = fig1.add_subplot(111)
-    pitch_angles           = PAD.compute_pitch_angles(core_data['v_dirs'],core_data['bfield'],time_label)
+    pitch_angles           = PAD.compute_pitch_angles(mode,core_data['v_dirs'],core_data['bfield'],time_label)
     flat_pitch_angles      = np.ndarray.flatten(pitch_angles)
     n_energies             = Ehigh - Elow + 1
     cols                   = list(reversed((cmap.rainbow(np.linspace(0,1,n_energies)))))
