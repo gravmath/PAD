@@ -30,7 +30,7 @@ def create_flux_survey_spectrum(mode,time_label,time_range_str,filepath,core_dat
         minPA      = i*20.0
         maxPA      = (i+1)*20.0
         
-        sterads    = PAD.compute_spherical_cap_area(minPA,maxPA)
+        sterads    = PAD.spherical_cap_area(maxPA) - PAD.spherical_cap_area(minPA)
         
         row        = int(np.floor(i/3))
         col        = i%3
@@ -52,11 +52,11 @@ def create_flux_survey_spectrum(mode,time_label,time_range_str,filepath,core_dat
     big_ax.spines['right'].set_color('none')
     big_ax.set_ylabel('Differential Number flux (s^-1 cm^-2 eV^-1 sr^-1)',fontsize=14)
     big_ax.set_xlabel('Energy (eV)', fontsize=14)
-    title_string = 'Binned PADs for %s\n (red -binned, blue-omnidirectional)' % core_data['edist']['Epoch'][time_label]
+    title_string = 'Binned PADs for %s\n (red -binned, blue-omnidirectional)' % core_data['dist_data']['Epoch'][time_label]
     big_ax.set_title(title_string, fontsize=14)
     fig1.tight_layout()    
-    filename = filepath+'flux_specturm_survey_'+time_range_str+'_%i.pdf' % time_label
-    fig1.savefig(filename,format='pdf',dpi=1200)
+    filename = filepath+'flux_specturm_survey_'+time_range_str+'_%i.png' % time_label
+    fig1.savefig(filename,format='png',dpi=1200)
     fig1.clf()
     plt.close()
 
@@ -87,7 +87,7 @@ def create_smooth_survey_PAD_plot(time_label,time_range_str,filepath,core_data):
     plt.close()
 
 ###############################################################################
-def create_raw_survey_PAD_plot(time_label,Elow,Ehigh,time_range_str,filepath,core_data):
+def create_raw_survey_PAD_plot(mode,time_label,Elow,Ehigh,time_range_str,filepath,core_data):
     fig1                   = plt.figure(figsize=(10,20))
     ax                     = fig1.add_subplot(111)
     pitch_angles           = PAD.compute_pitch_angles(mode,core_data['v_dirs'],core_data['bfield'],time_label)
@@ -102,11 +102,11 @@ def create_raw_survey_PAD_plot(time_label,Elow,Ehigh,time_range_str,filepath,cor
     plt.ylabel('Differential Number Flux (cm^-2 s^-1 eV^-1)',fontsize=14)
     handles, labels = ax.get_legend_handles_labels()
     lgd = ax.legend(handles, labels, loc='lower left',bbox_to_anchor=(1, 0.5))
-    plt.title(core_data['edist']['Epoch'][time_label])
+    plt.title(core_data['dist_data']['Epoch'][time_label])
     plt.grid(b=True, which='major', color='gray', linestyle='-')
     plt.grid(b=True, which='minor', color='gray', linestyle='--')
-    filename = filepath+'Raw_PAD_survey_'+time_range_str+'_%i.pdf' % time_label
-    fig1.savefig(filename,format='pdf',dpi=1200,bbox_extra_artists=(lgd,),bbox_inches='tight')    
+    filename = filepath+'Raw_PAD_survey_'+time_range_str+'_%i.png' % time_label
+    fig1.savefig(filename,format='png',dpi=300,bbox_extra_artists=(lgd,),bbox_inches='tight')    
     fig1.clf()
     plt.close()
 
@@ -232,33 +232,30 @@ def find_sign_intervals(times,signal):
 #####################################################################################
 #  Summary Plots
 #####################################################################################
-def make_brst_summary_plot(obs,curr_debug):
-    #unpack the CDF
-    times           = np.asarray(curr_debug['Epoch'])
-    energies        = np.asarray(curr_debug['%s_des_energy_brst' % obs])[0,:]
-    sc_pot          = np.asarray(curr_debug['%s_des_scpot_mean_brst' % obs])
-    bx              = np.asarray(curr_debug['%s_des_bentPipeB_X_DSC' % obs])
-    by              = np.asarray(curr_debug['%s_des_bentPipeB_Y_DSC' % obs])
-    bz              = np.asarray(curr_debug['%s_des_bentPipeB_Z_DSC' % obs])
-    bnorm           = np.asarray(curr_debug['%s_des_bentPipeB_Norm' % obs])
-    par             = np.asarray(curr_debug['%s_des_energyspectr_par_brst' % obs]).T
-    anti            = np.asarray(curr_debug['%s_des_energyspectr_anti_brst' % obs]).T
-    temp            = np.asarray(curr_debug['%s_des_energyspectr_omni_brst' % obs])
-    omni            = np.ma.masked_invalid(np.log10(temp).T)
-    temp            = np.asarray(curr_debug['%s_des_pitchangdist_lowen_brst' % obs])
-    low             = np.ma.masked_invalid(np.log10(temp).T)
-    temp            = np.asarray(curr_debug['%s_des_pitchangdist_miden_brst' % obs])
-    mid             = np.ma.masked_invalid(np.log10(temp).T)
-    temp            = np.asarray(curr_debug['%s_des_pitchangdist_highen_brst' % obs])
-    high            = np.ma.masked_invalid(np.log10(temp).T)
-    angles          = np.linspace(0,180,30)
-    ratio           = np.ma.masked_invalid(np.divide(par,anti))
+def make_brst_summary_plot(obs,moments_data,time_label):
     
-    BRST_time = dt.datetime.strftime(times[0],'%Y-%m-%d_%H%M')
+    times    = moments_data['times']   
+    energies = moments_data['energies']
+    sc_pot   = moments_data['sc_pot']  
+    bx       = moments_data['bx']      
+    by       = moments_data['by']      
+    bz       = moments_data['bz']      
+    bnorm    = moments_data['bnorm']   
+    par      = moments_data['par']     
+    anti     = moments_data['anti']    
+    perp     = moments_data['perp']    
+    omni     = moments_data['omni']    
+    low      = moments_data['low']     
+    mid      = moments_data['mid']     
+    high     = moments_data['high']    
+    angles   = moments_data['angles']  
+    ratio    = moments_data['ratio']   
+    
+    BRST_time = dt.datetime.strftime(times[time_label],'%Y-%m-%d %H%M%S.%f')
     
     ###########################################################################
     #create the figure and axes
-    fig = plt.figure(figsize=(16,20))
+    fig = plt.figure(figsize=(32,20))
     #fig.autofmt_xdate()
     
     cbar_off = 0.01
@@ -270,15 +267,15 @@ def make_brst_summary_plot(obs,curr_debug):
     #0th pane - spectrogram
     min_exp = 4
     max_exp = 8
-    ax0     = fig.add_subplot(611)
+    ax0     = fig.add_subplot(6,2,1)
     
     #plot the data
     spec_data = ax0.pcolormesh(times,energies,omni,cmap=cmap.jet,vmin=max_exp,vmax=min_exp)
     
     #deal with epochs on the x-axis
-    time_format = mdates.DateFormatter('%H:%M')
-    minutes     = mdates.MinuteLocator(range(0,59),interval = 10,tz=None)
-    ax0.xaxis.set_major_locator(minutes)
+    time_format = mdates.DateFormatter('%H:%M:%S')
+    seconds     = mdates.SecondLocator(range(0,59),interval = 5,tz=None)
+    ax0.xaxis.set_major_locator(seconds)
     ax0.xaxis.set_major_formatter(time_format)
     ax0.set_xlabel('Time')
     
@@ -298,20 +295,21 @@ def make_brst_summary_plot(obs,curr_debug):
     ax0.set_title('%s on %s' % (obs.upper(),BRST_time))
     
     ax0.plot(times,sc_pot,'k-')
+    ax0.axvline(times[time_label],color = 'k')
     
     ###########################################################################
     #1st pane - low energy PAD
     min_exp = int(np.floor(np.min(low)))
     max_exp = int(np.ceil(np.max(low)))
-    ax1 = fig.add_subplot(612)
+    ax1 = fig.add_subplot(6,2,3)
     
     #plot the data
     PAD_low_dat = ax1.pcolormesh(times,angles,low,cmap=cmap.bwr,vmin=min_exp,vmax=max_exp)
     
     #deal with epochs on the x-axis
-    time_format = mdates.DateFormatter('%H:%M')
-    minutes     = mdates.MinuteLocator(range(0,59),interval = 10,tz=None)
-    ax1.xaxis.set_major_locator(minutes)
+    time_format = mdates.DateFormatter('%H:%M:%S')
+    seconds     = mdates.SecondLocator(range(0,59),interval = 5,tz=None)
+    ax1.xaxis.set_major_locator(seconds)
     ax1.xaxis.set_major_formatter(time_format)
     ax1.set_xlabel('Time')
     
@@ -324,23 +322,22 @@ def make_brst_summary_plot(obs,curr_debug):
     log_cbar_span = np.array(range(min_exp,max_exp+1))
     cb_ax1        = fig.add_axes(cbar_position(ax1,cbar_off,cbar_wth))
     PAD_low_cbar  = fig.colorbar(PAD_low_dat,cax=cb_ax1,ticks=log_cbar_span,format=ticker.FormatStrFormatter('$10^{%d}$'))
-    #cbar_span     = ['%1.0e' % val for val in 10**log_cbar_span]
-    #cb_ax1.set_yticklabels(cbar_span)
+    ax1.axvline(times[time_label],color = 'k')
 
      
     ###########################################################################
     #2nd pane - mid energy PAD
     min_exp = int(np.floor(np.min(mid)))
     max_exp = int(np.ceil(np.max(mid))) 
-    ax2 = fig.add_subplot(613)
+    ax2 = fig.add_subplot(6,2,5)
     
     #plot the data
     PAD_mid_dat = ax2.pcolormesh(times,angles,mid,cmap=cmap.bwr)
     
     #deal with epochs on the x-axis
-    time_format = mdates.DateFormatter('%H:%M')
-    minutes     = mdates.MinuteLocator(range(0,59),interval = 10,tz=None)
-    ax2.xaxis.set_major_locator(minutes)
+    time_format = mdates.DateFormatter('%H:%M:%S')
+    seconds     = mdates.SecondLocator(range(0,59),interval = 5,tz=None)
+    ax2.xaxis.set_major_locator(seconds)
     ax2.xaxis.set_major_formatter(time_format)
     ax2.set_xlabel('Time')
     
@@ -353,23 +350,22 @@ def make_brst_summary_plot(obs,curr_debug):
     log_cbar_span = np.array(range(min_exp,max_exp+1))
     cb_ax2        = fig.add_axes(cbar_position(ax2,cbar_off,cbar_wth))
     PAD_mid_cbar  = fig.colorbar(PAD_mid_dat,cax=cb_ax2,ticks=log_cbar_span,format=ticker.FormatStrFormatter('$10^{%d}$'))
-    #cbar_span     = ['%1.0e' % val for val in 10**log_cbar_span]
-    #cb_ax2.set_yticklabels(cbar_span)
+    ax2.axvline(times[time_label],color = 'k')
     
 
     ###########################################################################
     #3rd pane - high energy PAD
     min_exp = int(np.floor(np.min(high)))
     max_exp = int(np.ceil(np.max(high))) 
-    ax3 = fig.add_subplot(614)
+    ax3 = fig.add_subplot(6,2,7)
     
     #plot the data
     PAD_high_dat = ax3.pcolormesh(times,angles,high,cmap=cmap.bwr)
     
     #deal with epochs on the x-axis
-    time_format = mdates.DateFormatter('%H:%M')
-    minutes     = mdates.MinuteLocator(range(0,59),interval = 10,tz=None)
-    ax3.xaxis.set_major_locator(minutes)
+    time_format = mdates.DateFormatter('%H:%M:%S')
+    seconds     = mdates.SecondLocator(range(0,59),interval = 5,tz=None)
+    ax3.xaxis.set_major_locator(seconds)
     ax3.xaxis.set_major_formatter(time_format)
     ax3.set_xlabel('Time')
     
@@ -382,23 +378,22 @@ def make_brst_summary_plot(obs,curr_debug):
     log_cbar_span = np.array(range(min_exp,max_exp+1))
     cb_ax3        = fig.add_axes(cbar_position(ax3,cbar_off,cbar_wth))
     PAD_high_cbar = fig.colorbar(PAD_high_dat,cax=cb_ax3,ticks=log_cbar_span,format=ticker.FormatStrFormatter('$10^{%d}$'))
-    #cbar_span     = ['%1.0e' % val for val in 10**log_cbar_span]
-    #cb_ax3.set_yticklabels(cbar_span)
+    ax3.axvline(times[time_label],color = 'k')
 
     ###########################################################################
     #4th pane - ratio of PADs
-    ax4 = fig.add_subplot(615)
+    ax4 = fig.add_subplot(6,2,9)
     
     #plot the data
     asym_data = ax4.pcolormesh(times,energies,ratio,cmap=cmap.bwr,vmin=0.6,vmax=1.4)
     
     #deal with epochs on the x-axis
-    time_format = mdates.DateFormatter('%H:%M')
-    minutes     = mdates.MinuteLocator(range(0,59),interval = 10,tz=None)
-    ax4.xaxis.set_major_locator(minutes)
+    time_format = mdates.DateFormatter('%H:%M:%S')
+    seconds     = mdates.SecondLocator(range(0,59),interval = 5,tz=None)
+    ax4.xaxis.set_major_locator(seconds)
     ax4.xaxis.set_major_formatter(time_format)
     ax4.set_xlabel('Time')
-    
+   
     #deal with the y-axis
     ax4.set_yscale('log')
     ax4.set_ylim([energies[0],energies[31]])
@@ -407,28 +402,97 @@ def make_brst_summary_plot(obs,curr_debug):
     #create the colorbar
     cb_ax4          = fig.add_axes(cbar_position(ax4,cbar_off,cbar_wth))
     asym_cbar       = fig.colorbar(asym_data,cax=cb_ax4)
+    ax4.axvline(times[time_label],color = 'k')    
 
     ###########################################################################
     #5th pane - mag field
-    ax5 = fig.add_subplot(616)
+    ax5 = fig.add_subplot(6,2,11)
     
     #plot the data
     ax5.plot(times,bx*bnorm,label='Bx')
     ax5.plot(times,by*bnorm,label='By')
     ax5.plot(times,bz*bnorm,label='Bz')
+    ax5.set_xlim([times[0],times[-1]])
     
     #deal with epochs on the x-axis
-    time_format = mdates.DateFormatter('%H:%M')
-    minutes     = mdates.MinuteLocator(range(0,59),interval = 10,tz=None)
-    ax5.xaxis.set_major_locator(minutes)
+    time_format = mdates.DateFormatter('%H:%M:%S')
+    seconds     = mdates.SecondLocator(range(0,59),interval = 5,tz=None)
+    ax5.xaxis.set_major_locator(seconds)
     ax5.xaxis.set_major_formatter(time_format)
     ax5.set_xlabel('Time')
     
     #deal with the y-axis
     ax5.set_yscale('linear')
     ax5.set_ylabel('Magnetic Field (nT)')
+    ax5.axvline(times[time_label],color = 'k')
     
     ax5.legend(bbox_to_anchor=[1.12,1.0])
+
+    ###########################################################################
+    #6th pane - energy spectra
+    ax6     = fig.add_subplot(6,2,2)
+    Q_par   = 10**(par[:,time_label])
+    Q_perp  = 10**(perp[:,time_label])
+    Q_anti  = 10**(anti[:,time_label])
+    
+    #plot the data
+    par_spec_data  = ax6.loglog(energies,Q_par,'ko-',label='Parallel')
+    perp_spec_data = ax6.loglog(energies,Q_perp,'gs-',label='Perpendicular')
+    anti_spec_data = ax6.loglog(energies,Q_anti,'r^-',label='Anti-Parallel')
+    
+    #x-axis
+    ax6.set_xlabel('Energy (eV)')
+    ax6.set_xlim([50.0,30.0e3])
+    
+    #deal with the y-axis
+    ax6.set_ylabel('PSD (cm^-6 s^-3)')
+    
+    ax6.legend(bbox_to_anchor=[1.12,1.0])
+       
+    ###########################################################################
+    #7th pane - perpendicular energy spectrum
+    #ax7     = fig.add_subplot(6,2,4)
+    
+    
+    ###########################################################################
+    #8th pane - anti-parallel energy spectrum
+    #ax8     = fig.add_subplot(6,2,6)
+    
+    
+    ###########################################################################
+    #9th pane - Differnential Counter-Streaming energy spectrum
+    ax9     = fig.add_subplot(6,2,8)
+    
+    #plot the data
+    ax9.semilogx(energies,Q_par - Q_anti,'b.-')
+    
+    #x-axis
+    ax9.set_xlabel('Energy (eV)')
+    ax9.set_xlim([50.0,30.0e3])    
+    
+    #deal with the y-axis
+    ax9.set_ylabel('Differential Counter-Streaming \n PSD (cm^-6 s^-3)')
+    ax9.axhline(0,color='k')
+    ax9.grid('on')
+    
+    ###########################################################################
+    #10th pane - Relative Counter-Streaming energy spectrum
+    ax10     = fig.add_subplot(6,2,10)
+    
+    #plot the data
+    ax10.semilogx(energies,np.divide(Q_par,Q_anti),'b.-')
+    
+    #x-axis
+    ax10.set_xlabel('Energy (eV)')
+    ax10.set_xlim([50.0,30.0e3])
+    
+    #deal with the y-axis
+    ax10.set_ylabel('Relative Counter-Streaming\n PSD (Par/Anti)')
+    ax10.set_ylim([0.2,1.8])
+    ax10.axhline(1,color='k')
+    ax10.grid('on')    
+    
+    
     ###########################################################################
     #save the file
     
@@ -437,6 +501,7 @@ def make_brst_summary_plot(obs,curr_debug):
     fig.savefig(filename)
     fig.clf()
 
+    
 #####################################################################################
 def make_fast_summary_plot(obs,curr_debug):
     #unpack the CDF

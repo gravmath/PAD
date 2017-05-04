@@ -446,3 +446,55 @@ def load_particle_data(cdf_dict,obs,mode,species,ver,corrections_on,correction_o
     core_data['jN_err']      = jN_err
     
     return core_data    
+
+###############################################################################    
+#
+#  load_e_data reads a distribution file and debug file and returns a host of
+#  numpy arrays
+#
+###############################################################################    
+def load_moments_data(obs,curr_debug):
+    #unpack the CDF
+    times           = np.asarray(curr_debug['Epoch'])
+    energies        = np.asarray(curr_debug['%s_des_energy_brst' % obs])[0,:]
+    sc_pot          = np.asarray(curr_debug['%s_des_scpot_mean_brst' % obs])
+    bx              = np.asarray(curr_debug['%s_des_bentPipeB_X_DSC' % obs])
+    by              = np.asarray(curr_debug['%s_des_bentPipeB_Y_DSC' % obs])
+    bz              = np.asarray(curr_debug['%s_des_bentPipeB_Z_DSC' % obs])
+    bnorm           = np.asarray(curr_debug['%s_des_bentPipeB_Norm' % obs])
+    par             = np.asarray(curr_debug['%s_des_energyspectr_par_brst' % obs]).T
+    anti            = np.asarray(curr_debug['%s_des_energyspectr_anti_brst' % obs]).T
+    perp            = np.asarray(curr_debug['%s_des_energyspectr_perp_brst' % obs]).T    
+    temp            = np.asarray(curr_debug['%s_des_energyspectr_omni_brst' % obs])
+    omni            = np.ma.masked_invalid(np.log10(temp).T)
+    temp            = np.asarray(curr_debug['%s_des_pitchangdist_lowen_brst' % obs])
+    low             = np.ma.masked_invalid(np.log10(temp).T)
+    temp            = np.asarray(curr_debug['%s_des_pitchangdist_miden_brst' % obs])
+    mid             = np.ma.masked_invalid(np.log10(temp).T)
+    temp            = np.asarray(curr_debug['%s_des_pitchangdist_highen_brst' % obs])
+    high            = np.ma.masked_invalid(np.log10(temp).T)
+    angles          = np.linspace(0,180,30)
+    ratio           = np.ma.masked_invalid(np.divide(par,anti))
+    anti            = np.ma.masked_invalid(np.log10(anti))
+    par             = np.ma.masked_invalid(np.log10(par))
+    perp            = np.ma.masked_invalid(np.log10(perp))
+    
+    moments_data             = {}
+    moments_data['times']    = times   
+    moments_data['energies'] = energies
+    moments_data['sc_pot']   = sc_pot  
+    moments_data['bx']       = bx      
+    moments_data['by']       = by      
+    moments_data['bz']       = bz      
+    moments_data['bnorm']    = bnorm   
+    moments_data['par']      = par     
+    moments_data['anti']     = anti    
+    moments_data['perp']     = perp    
+    moments_data['omni']     = omni    
+    moments_data['low']      = low     
+    moments_data['mid']      = mid     
+    moments_data['high']     = high    
+    moments_data['angles']   = angles  
+    moments_data['ratio']    = ratio   
+
+    return moments_data    
