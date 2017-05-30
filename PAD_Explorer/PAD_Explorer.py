@@ -16,5 +16,5 @@ obs            = 'mms1'
 mode           = 'brst'
 species        = 'des'
 ver            = 'ver3'
-corrections_on = 1
+corrections_on = 0
 core_data      = PAD.load_particle_data(cdf_dict,obs,mode,species,ver,corrections_on)
