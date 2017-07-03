@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-import numpy  as np
+import datetime           as dt
+import numpy              as np
 import SunEph 
 import equation_of_time
 
@@ -90,3 +91,59 @@ def convert_to_LM(B):
     y_LM   = np.cross(z_LM,x_LM)
     
     return np.vstack((x_LM,y_LM,z_LM))   
+
+###############################################################################    
+def construct_interpolants(cursor,fpi_prd1,obs,mode,descriptor,year,month,day):
+    mquery = cursor.execute('Select ver, filename from mec_data where\
+                                                obs        = "%s" and\
+                                                mode       = "%s" and\
+                                                descriptor = "%s" and\
+                                                year       =  %s  and\
+                                                month      =  %s  and\
+                                                day        =  %s;' % \
+                                         (obs,mode,descriptor,year,month,day))
+    
+    Re       = 6378.14
+    mresults = mquery.fetchall()
+    for mr in mresults:
+        MEC_file = fpi_prd1+mr[1]
+        MEC      = pycdf.CDF(MEC_file)
+        mt       = mdates.date2num(MEC['Epoch'])
+        mr_gsm   = np.asarray(MEC['%s_mec_r_gsm'%obs])/Re
+        MEC.close()
+        orbit_extent = np.max(np.abs(mr_gsm))
+        if orbit_extent < 50.0*Re:
+            x_gsm_spline = interp.splrep(mt,mr_gsm[:,0])
+            y_gsm_spline = interp.splrep(mt,mr_gsm[:,1])
+            z_gsm_spline = interp.splrep(mt,mr_gsm[:,2])
+            return x_gsm_spline, y_gsm_spline, z_gsm_spline
+
+    #if no MEC file works
+    return False, False, False    
+    
+###############################################################################
+def round_time(epoch, date_delta=dt.timedelta(minutes=1), to='average'):
+    """
+    Purpose:      Round a datetime object to a multiple of a timedelta
+    epoch:        datetime.datetime object, no default
+    dateDelta:    timedelta object, we round to a multiple of this, 
+                  default 1 minute.
+    Adapted from: http://stackoverflow.com/questions/3463930/
+                  how-to-round-the-minute-of-a-datetime-object-python
+    """
+    round_to = date_delta.total_seconds()
+
+    if epoch is None:
+        epoch = dt.datetime.now()
+    seconds = (epoch - epoch.min).seconds
+
+    if to == 'up':
+        # // is a floor division
+        rounding = (seconds + round_to) // round_to * round_to
+    elif to == 'down':
+        rounding = seconds // round_to * round_to
+    else:
+        rounding = (seconds + round_to / 2) // round_to * round_to
+
+    return epoch + dt.timedelta(0, rounding - seconds, -epoch.microsecond)
+    

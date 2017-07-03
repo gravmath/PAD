@@ -8,15 +8,14 @@ import re
 #  File Scraping Utility Functions
 ###############################################################################
 ###############################################################################
-def construct_file_selector(obs,mode,descriptor,ver):
-    pattern_str  = '%s_fpi_%s_l2_%s_\d{14}_v%s.cdf' % (obs,mode,descriptor,ver)
+def construct_file_selector(obs,instrument,mode,descriptor,ver):
+    if instrument == 'mec':
+        pattern_str  = '%s_%s_%s_l2_%s_\d{8}_v%s.cdf'  % (obs,instrument,mode,descriptor,ver)
+    else:
+        pattern_str  = '%s_%s_%s_l2_%s_\d{14}_v%s.cdf' % (obs,instrument,mode,descriptor,ver)
     print 'encoding a search for %s!' % pattern_str
     return re.compile(pattern_str)
     
-def file_epoch(filename):
-    basename = os.path.basename(filename)
-    return basename.split('_')[5]
-
 def scrape_files(regex_pattern,targ_dir):
     
     filtered_files   = []
@@ -26,4 +25,10 @@ def scrape_files(regex_pattern,targ_dir):
                 full_filename = (root+'/'+file).replace('\\','/')
                 filtered_files.append(full_filename)
                 
-    return np.array(filtered_files).flatten()
+    return np.sort(np.array(filtered_files).flatten())
+
+def file_epoch(filename):
+    basename = os.path.basename(filename)
+    return basename.split('_')[5]
+
+
