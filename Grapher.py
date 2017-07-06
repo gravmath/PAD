@@ -9,7 +9,7 @@ import numpy              as np
 import Convert
 import PAD
 
-brst_parms = {'time_format'  :mdates.DateFormatter('%H:%M'),
+brst_parms = {'time_format'  :mdates.DateFormatter('%H:%M:%S'),
               'time_location':mdates.SecondLocator([0,20,40])}
               
 brst_delta = dt.timedelta(seconds=20)
@@ -18,7 +18,7 @@ brst_delta = dt.timedelta(seconds=20)
 def add_info_box(fig,date,geometry):
     dax = fig.add_axes(geometry)
     quiet_axis(dax)
-    string = 'hh:mm\nX-GSM (Re)\nY-GSM (Re)\nZ-GSM (Re)\n%s' % date
+    string = 'hh:mm:ss\nX-GSM (Re)\nY-GSM (Re)\nZ-GSM (Re)\n%s' % date
     dax.annotate(string,xy=(0.5,0.5))    
 
 ###############################################################################
@@ -114,3 +114,26 @@ class traces():
             self.ax.set_yscale(ax_parms['yscale'])
         if ax_parms['loc'] != '':
             self.ax.legend(loc=ax_parms['loc'])  
+
+###############################################################################
+class patch():
+    def __init__(self,ax,x,y,z,val_min,val_max):
+        self.x           = x
+        self.y           = y
+        self.z           = z
+        self.ax          = ax
+        self.val_min     = val_min
+        self.val_max     = val_max
+        self.patch       = self.ax.pcolormesh(x,y,z,vmin=self.val_min,vmax=self.val_max)
+        self.cbar        = 'null'
+        self.cbar_off    = 0.01
+        self.cbar_wth    = 0.01   
+        self.cbar_format = ticker.FormatStrFormatter('$10^{%d}$')
+    def set_colormap(self,cmap):
+        self.patch.set_cmap(cmap=cmap)
+    def add_colorbar(self,fig):
+        self.cbar_span = np.array(range(self.val_min,self.val_max+1))
+        self.cbar      = fig.add_axes(cbar_position(self.ax,self.cbar_off,self.cbar_wth))
+        fig.colorbar(self.patch,cax=self.cbar,ticks=self.cbar_span,format=self.cbar_format)  
+        
+#################################################################################
