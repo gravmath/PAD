@@ -23,6 +23,6 @@ core_data      = PAD.load_particle_data(cdf_dict,obs,mode,species,ver,correction
 num_time_steps = len(core_data['dist_data']['Epoch'])
 
 time_interval_str = 'Burst Interval 08_09_2017 09_20_44'
-file_path         = 'c:/Users/cschiff/Documents/GitHub/PAD/'
+file_path         = 'c:/Users/cschiff/Documents/GitHub/'
 for time_label in range(33,num_time_steps):
     Grapher.create_flux_survey_spectrum(mode,time_label,time_interval_str,file_path,core_data)

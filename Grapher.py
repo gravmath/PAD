@@ -125,6 +125,7 @@ class patch():
         self.val_min     = val_min
         self.val_max     = val_max
         self.patch       = self.ax.pcolormesh(x,y,z,vmin=self.val_min,vmax=self.val_max)
+        self.cax         = 'null'
         self.cbar        = 'null'
         self.cbar_off    = 0.01
         self.cbar_wth    = 0.01   
@@ -133,7 +134,7 @@ class patch():
         self.patch.set_cmap(cmap=cmap)
     def add_colorbar(self,fig):
         self.cbar_span = np.array(range(self.val_min,self.val_max+1))
-        self.cbar      = fig.add_axes(cbar_position(self.ax,self.cbar_off,self.cbar_wth))
-        fig.colorbar(self.patch,cax=self.cbar,ticks=self.cbar_span,format=self.cbar_format)  
+        self.cax       = fig.add_axes(cbar_position(self.ax,self.cbar_off,self.cbar_wth))
+        self.cbar      = fig.colorbar(self.patch,cax=self.cax,ticks=self.cbar_span,format=self.cbar_format)  
         
 #################################################################################
