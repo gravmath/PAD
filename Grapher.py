@@ -11,15 +11,13 @@ import PAD
 
 brst_parms = {'time_format'  :mdates.DateFormatter('%H:%M:%S'),
               'time_location':mdates.SecondLocator([0,20,40])}
-              
+
 brst_delta = dt.timedelta(seconds=20)
 
-###############################################################################
-def add_info_box(fig,date,geometry):
-    dax = fig.add_axes(geometry)
-    quiet_axis(dax)
-    string = 'hh:mm:ss\nX-GSM (Re)\nY-GSM (Re)\nZ-GSM (Re)\n%s' % date
-    dax.annotate(string,xy=(0.5,0.5))    
+fast_parms = {'time_format'  :mdates.DateFormatter('%H:%M:%S'),
+              'time_location':mdates.MinuteLocator([0,10,20,30,40,50])}
+
+fast_delta = dt.timedelta(minutes=10)
 
 ###############################################################################
 def cbar_position(current_ax,offset,cbar_width):
@@ -30,7 +28,8 @@ def cbar_position(current_ax,offset,cbar_width):
 
 ###############################################################################
 def quiet_axis(ax):
-    ax.set_axis_bgcolor('none')
+    #ax.set_axis_bgcolor('none')
+    ax.set_facecolor('none')
     ax.tick_params(labelcolor='none',top='off',bottom='off',left='off',right='off')
     ax.spines['top'].set_color('none')
     ax.spines['bottom'].set_color('none')
@@ -101,6 +100,12 @@ class traces():
             self.ax.xaxis.set_major_formatter(brst_parms['time_format'])
             t0 = Convert.round_time(t[0], date_delta=brst_delta,to='down')
             tf = Convert.round_time(t[-1],date_delta=brst_delta,to='up')
+            self.ax.set_xlim([t0,tf])
+        if tformat == 'fast':
+            self.ax.xaxis.set_major_locator(fast_parms['time_location'])
+            self.ax.xaxis.set_major_formatter(fast_parms['time_format'])
+            t0 = Convert.round_time(t[0], date_delta=fast_delta,to='down')
+            tf = Convert.round_time(t[-1],date_delta=fast_delta,to='up')
             self.ax.set_xlim([t0,tf])
     def customize_ax(self,ax_parms):
         self.ax.set_xlabel(ax_parms['xlabel'])
