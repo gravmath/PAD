@@ -68,7 +68,7 @@ def make_Tperp_panel(ax,obs,e_t,e_Tperp,i_t,i_Tperp):
                                             'xscale':'',\
                                             'xlim':[],\
                                             'ylabel':'%s\nTemp\n[eV]'%obs,\
-                                            'ylim':[1e2,1e4],\
+                                            'ylim':[1,1e4],\
                                             'yscale':'log'})
 
 ###############################################################################
@@ -102,14 +102,14 @@ def make_iVvector_panel(ax,obs,i_t,i_V):
                                         'yscale':''})
 
 ###############################################################################    
-def make_Et_panel(fig,ax,obs,t,E,s,sc_pot):
+def make_Et_panel(fig,ax,obs,species,t,E,s,sc_pot):
     Et_spec = Grapher.patch(ax,t,E,np.ma.masked_invalid(np.log10(s)).T,4,8)
     cmap.jet.set_bad('k',alpha=1.0) 
     Et_spec.set_colormap(cmap.jet)
     Et_spec.add_colorbar(fig)
     ax.set_yscale('log')
     ax.plot(t,sc_pot,'w-',linewidth = 3)
-    ax.set_ylabel('Energy\n[eV]')
+    ax.set_ylabel('%s\n%s\nEnergy\n[eV]'%(obs,species))
     Et_spec.cbar.set_label('keV/(cm^2 s sr keV)')
     
 ###############################################################################
