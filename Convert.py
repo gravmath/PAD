@@ -85,14 +85,14 @@ def calc_LT(V,x0_val=12):
     return (LT+x0_val) % 24    
 
 ###############################################################################
-def convert_to_LM(B):
+def convert_to_LM(B,U):
     B_norm = np.sqrt(B.dot(B))
+    U_norm = np.sqrt(U.dot(U))
     z_LM   =  B/B_norm
-    z_sc   = np.array([0,0,1])
-    x      = np.cross(z_sc,B)
-    x_norm = np.sqrt(x.dot(x))
-    x_LM   = x/x_norm
-    y_LM   = np.cross(z_LM,x_LM)
+    y      = np.cross(B,U)
+    y_norm = np.sqrt(y.dot(y))
+    y_LM   = y/y_norm
+    x_LM   = np.cross(y_LM,z_LM)
     
     return np.vstack((x_LM,y_LM,z_LM))   
 
