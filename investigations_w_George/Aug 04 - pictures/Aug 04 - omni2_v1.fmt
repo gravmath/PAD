@@ -1,0 +1,19 @@
+  FORMAT OF THE SUBSETTED FILE
+    
+    ITEMS                      FORMAT   
+     
+ 1 YEAR                          I4               0
+ 2 DOY                           I4               0
+ 3 Hour                          I3               0
+ 4 Scalar B, nT                  F6.1             0
+ 5 BX, nT (GSE, GSM)             F6.1             1
+ 6 BY, nT (GSM)                  F6.1             2
+ 7 BZ, nT (GSM)                  F6.1             3
+ 8 SW Plasma Temperature, K      F9.0             4
+ 9 SW Proton Density, N/cm^3     F6.1             5
+10 SW Plasma Speed, km/s         F6.0             6
+11 Flow pressure                 F6.2             7
+12 Dst-index, nT                 I6               8
+13 ap_index, nT                  I4               9
+
+This file was produced by SPDF OMNIWeb Plus service
