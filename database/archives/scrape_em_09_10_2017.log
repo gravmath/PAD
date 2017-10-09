@@ -1,0 +1,500 @@
+Encoding a search for mms1_edp_brst_l2_dce_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms1/edp/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 22629 mms1-edp-brst-dce files
+
+Encoding a search for mms2_edp_brst_l2_dce_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms2/edp/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 22797 mms2-edp-brst-dce files
+
+Encoding a search for mms3_edp_brst_l2_dce_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms3/edp/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 22618 mms3-edp-brst-dce files
+
+Encoding a search for mms4_edp_brst_l2_dce_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms4/edp/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 22739 mms4-edp-brst-dce files
+
+Encoding a search for mms1_edp_brst_l2_hmfe_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms1/edp/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 24116 mms1-edp-brst-hmfe files
+
+Encoding a search for mms2_edp_brst_l2_hmfe_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms2/edp/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 24083 mms2-edp-brst-hmfe files
+
+Encoding a search for mms3_edp_brst_l2_hmfe_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms3/edp/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 23955 mms3-edp-brst-hmfe files
+
+Encoding a search for mms4_edp_brst_l2_hmfe_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms4/edp/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 23559 mms4-edp-brst-hmfe files
+
+Encoding a search for mms1_edp_brst_l2_scpot_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms1/edp/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 24772 mms1-edp-brst-scpot files
+
+Encoding a search for mms2_edp_brst_l2_scpot_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms2/edp/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 24729 mms2-edp-brst-scpot files
+
+Encoding a search for mms3_edp_brst_l2_scpot_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms3/edp/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 24693 mms3-edp-brst-scpot files
+
+Encoding a search for mms4_edp_brst_l2_scpot_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms4/edp/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 24197 mms4-edp-brst-scpot files
+
+Encoding a search for mms1_edp_fast_l2_dce_\d{8}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms1/edp/fast/l2
+*
+Found 712 mms1-edp-fast-dce files
+
+Encoding a search for mms2_edp_fast_l2_dce_\d{8}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms2/edp/fast/l2
+*
+Found 712 mms2-edp-fast-dce files
+
+Encoding a search for mms3_edp_fast_l2_dce_\d{8}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms3/edp/fast/l2
+*
+Found 706 mms3-edp-fast-dce files
+
+Encoding a search for mms4_edp_fast_l2_dce_\d{8}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms4/edp/fast/l2
+*
+Found 706 mms4-edp-fast-dce files
+
+Encoding a search for mms1_edp_fast_l2_scpot_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms1/edp/fast/l2
+*
+Found 762 mms1-edp-fast-scpot files
+
+Encoding a search for mms2_edp_fast_l2_scpot_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms2/edp/fast/l2
+*
+Found 759 mms2-edp-fast-scpot files
+
+Encoding a search for mms3_edp_fast_l2_scpot_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms3/edp/fast/l2
+*
+Found 758 mms3-edp-fast-scpot files
+
+Encoding a search for mms4_edp_fast_l2_scpot_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms4/edp/fast/l2
+*
+Found 743 mms4-edp-fast-scpot files
+
+Encoding a search for mms1_fgm_brst_l2_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms1/fgm/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 23983 mms1-fgm-brst- files
+
+Encoding a search for mms2_fgm_brst_l2_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms2/fgm/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 23958 mms2-fgm-brst- files
+
+Encoding a search for mms3_fgm_brst_l2_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms3/fgm/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 23843 mms3-fgm-brst- files
+
+Encoding a search for mms4_fgm_brst_l2_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms4/fgm/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 23470 mms4-fgm-brst- files
+
+Encoding a search for mms1_fgm_srvy_l2_\d{8}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms1/fgm/srvy/l2
+*
+Found 728 mms1-fgm-srvy- files
+
+Encoding a search for mms2_fgm_srvy_l2_\d{8}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms2/fgm/srvy/l2
+*
+Found 728 mms2-fgm-srvy- files
+
+Encoding a search for mms3_fgm_srvy_l2_\d{8}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms3/fgm/srvy/l2
+*
+Found 724 mms3-fgm-srvy- files
+
+Encoding a search for mms4_fgm_srvy_l2_\d{8}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms4/fgm/srvy/l2
+*
+Found 724 mms4-fgm-srvy- files
+
+Encoding a search for mms1_fpi_brst_l2_des-debug_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms1/fpi/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 15808 mms1-fpi-brst-des-debug files
+
+Encoding a search for mms2_fpi_brst_l2_des-debug_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms2/fpi/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 15863 mms2-fpi-brst-des-debug files
+
+Encoding a search for mms3_fpi_brst_l2_des-debug_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms3/fpi/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 16085 mms3-fpi-brst-des-debug files
+
+Encoding a search for mms4_fpi_brst_l2_des-debug_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms4/fpi/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 15236 mms4-fpi-brst-des-debug files
+
+Encoding a search for mms1_fpi_brst_l2_des-dist_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms1/fpi/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 15808 mms1-fpi-brst-des-dist files
+
+Encoding a search for mms2_fpi_brst_l2_des-dist_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms2/fpi/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 15863 mms2-fpi-brst-des-dist files
+
+Encoding a search for mms3_fpi_brst_l2_des-dist_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms3/fpi/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 16085 mms3-fpi-brst-des-dist files
+
+Encoding a search for mms4_fpi_brst_l2_des-dist_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms4/fpi/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 15236 mms4-fpi-brst-des-dist files
+
+Encoding a search for mms1_fpi_brst_l2_des-moms_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms1/fpi/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 15808 mms1-fpi-brst-des-moms files
+
+Encoding a search for mms2_fpi_brst_l2_des-moms_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms2/fpi/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 15863 mms2-fpi-brst-des-moms files
+
+Encoding a search for mms3_fpi_brst_l2_des-moms_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms3/fpi/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 16085 mms3-fpi-brst-des-moms files
+
+Encoding a search for mms4_fpi_brst_l2_des-moms_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms4/fpi/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 15236 mms4-fpi-brst-des-moms files
+
+Encoding a search for mms1_fpi_brst_l2_dis-debug_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms1/fpi/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 15808 mms1-fpi-brst-dis-debug files
+
+Encoding a search for mms2_fpi_brst_l2_dis-debug_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms2/fpi/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 15863 mms2-fpi-brst-dis-debug files
+
+Encoding a search for mms3_fpi_brst_l2_dis-debug_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms3/fpi/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 14623 mms3-fpi-brst-dis-debug files
+
+Encoding a search for mms4_fpi_brst_l2_dis-debug_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms4/fpi/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 15236 mms4-fpi-brst-dis-debug files
+
+Encoding a search for mms1_fpi_brst_l2_dis-dist_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms1/fpi/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 15808 mms1-fpi-brst-dis-dist files
+
+Encoding a search for mms2_fpi_brst_l2_dis-dist_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms2/fpi/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 15863 mms2-fpi-brst-dis-dist files
+
+Encoding a search for mms3_fpi_brst_l2_dis-dist_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms3/fpi/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 15509 mms3-fpi-brst-dis-dist files
+
+Encoding a search for mms4_fpi_brst_l2_dis-dist_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms4/fpi/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 15236 mms4-fpi-brst-dis-dist files
+
+Encoding a search for mms1_fpi_brst_l2_dis-moms_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms1/fpi/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 15808 mms1-fpi-brst-dis-moms files
+
+Encoding a search for mms2_fpi_brst_l2_dis-moms_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms2/fpi/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 15863 mms2-fpi-brst-dis-moms files
+
+Encoding a search for mms3_fpi_brst_l2_dis-moms_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms3/fpi/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 15509 mms3-fpi-brst-dis-moms files
+
+Encoding a search for mms4_fpi_brst_l2_dis-moms_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms4/fpi/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 15236 mms4-fpi-brst-dis-moms files
+
+Encoding a search for mms1_fpi_fast_l2_des-debug_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms1/fpi/fast/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 3718 mms1-fpi-fast-des-debug files
+
+Encoding a search for mms2_fpi_fast_l2_des-debug_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms2/fpi/fast/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 3710 mms2-fpi-fast-des-debug files
+
+Encoding a search for mms3_fpi_fast_l2_des-debug_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms3/fpi/fast/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 3715 mms3-fpi-fast-des-debug files
+
+Encoding a search for mms4_fpi_fast_l2_des-debug_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms4/fpi/fast/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 3640 mms4-fpi-fast-des-debug files
+
+Encoding a search for mms1_fpi_fast_l2_des-dist_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms1/fpi/fast/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 3721 mms1-fpi-fast-des-dist files
+
+Encoding a search for mms2_fpi_fast_l2_des-dist_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms2/fpi/fast/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 3713 mms2-fpi-fast-des-dist files
+
+Encoding a search for mms3_fpi_fast_l2_des-dist_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms3/fpi/fast/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 3718 mms3-fpi-fast-des-dist files
+
+Encoding a search for mms4_fpi_fast_l2_des-dist_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms4/fpi/fast/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 3643 mms4-fpi-fast-des-dist files
+
+Encoding a search for mms1_fpi_fast_l2_des-moms_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms1/fpi/fast/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 3721 mms1-fpi-fast-des-moms files
+
+Encoding a search for mms2_fpi_fast_l2_des-moms_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms2/fpi/fast/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 3713 mms2-fpi-fast-des-moms files
+
+Encoding a search for mms3_fpi_fast_l2_des-moms_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms3/fpi/fast/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 3718 mms3-fpi-fast-des-moms files
+
+Encoding a search for mms4_fpi_fast_l2_des-moms_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms4/fpi/fast/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 3643 mms4-fpi-fast-des-moms files
+
+Encoding a search for mms1_fpi_fast_l2_dis-debug_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms1/fpi/fast/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 3716 mms1-fpi-fast-dis-debug files
+
+Encoding a search for mms2_fpi_fast_l2_dis-debug_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms2/fpi/fast/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 3710 mms2-fpi-fast-dis-debug files
+
+Encoding a search for mms3_fpi_fast_l2_dis-debug_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms3/fpi/fast/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 3594 mms3-fpi-fast-dis-debug files
+
+Encoding a search for mms4_fpi_fast_l2_dis-debug_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms4/fpi/fast/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 3640 mms4-fpi-fast-dis-debug files
+
+Encoding a search for mms1_fpi_fast_l2_dis-dist_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms1/fpi/fast/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 3719 mms1-fpi-fast-dis-dist files
+
+Encoding a search for mms2_fpi_fast_l2_dis-dist_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms2/fpi/fast/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 3713 mms2-fpi-fast-dis-dist files
+
+Encoding a search for mms3_fpi_fast_l2_dis-dist_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms3/fpi/fast/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 3597 mms3-fpi-fast-dis-dist files
+
+Encoding a search for mms4_fpi_fast_l2_dis-dist_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms4/fpi/fast/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 3643 mms4-fpi-fast-dis-dist files
+
+Encoding a search for mms1_fpi_fast_l2_dis-moms_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms1/fpi/fast/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 3719 mms1-fpi-fast-dis-moms files
+
+Encoding a search for mms2_fpi_fast_l2_dis-moms_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms2/fpi/fast/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 3713 mms2-fpi-fast-dis-moms files
+
+Encoding a search for mms3_fpi_fast_l2_dis-moms_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms3/fpi/fast/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 3597 mms3-fpi-fast-dis-moms files
+
+Encoding a search for mms4_fpi_fast_l2_dis-moms_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms4/fpi/fast/l2
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Found 3643 mms4-fpi-fast-dis-moms files
+
+Encoding a search for mms1_mec_brst_l2_epht89d_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms1/mec/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * *
+Found 7994 mms1-mec-brst-epht89d files
+
+Encoding a search for mms2_mec_brst_l2_epht89d_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms2/mec/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * *
+Found 7898 mms2-mec-brst-epht89d files
+
+Encoding a search for mms3_mec_brst_l2_epht89d_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms3/mec/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * *
+Found 7907 mms3-mec-brst-epht89d files
+
+Encoding a search for mms4_mec_brst_l2_epht89d_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms4/mec/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * *
+Found 7790 mms4-mec-brst-epht89d files
+
+Encoding a search for mms1_mec_brst_l2_epht89q_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms1/mec/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * *
+Found 7979 mms1-mec-brst-epht89q files
+
+Encoding a search for mms2_mec_brst_l2_epht89q_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms2/mec/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * *
+Found 7767 mms2-mec-brst-epht89q files
+
+Encoding a search for mms3_mec_brst_l2_epht89q_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms3/mec/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * *
+Found 7879 mms3-mec-brst-epht89q files
+
+Encoding a search for mms4_mec_brst_l2_epht89q_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms4/mec/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * *
+Found 7751 mms4-mec-brst-epht89q files
+
+Encoding a search for mms1_mec_brst_l2_ephts04d_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms1/mec/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * * *
+Found 7899 mms1-mec-brst-ephts04d files
+
+Encoding a search for mms2_mec_brst_l2_ephts04d_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms2/mec/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * *
+Found 7787 mms2-mec-brst-ephts04d files
+
+Encoding a search for mms3_mec_brst_l2_ephts04d_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms3/mec/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * *
+Found 7859 mms3-mec-brst-ephts04d files
+
+Encoding a search for mms4_mec_brst_l2_ephts04d_\d{14}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms4/mec/brst/l2
+* * * * * * * * * * * * * * * * * * * * * * *
+Found 7725 mms4-mec-brst-ephts04d files
+
+Encoding a search for mms1_mec_srvy_l2_epht89d_\d{8}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms1/mec/srvy/l2
+* * * * * * * * *
+Found 938 mms1-mec-srvy-epht89d files
+
+Encoding a search for mms2_mec_srvy_l2_epht89d_\d{8}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms2/mec/srvy/l2
+* * * * * * * * *
+Found 938 mms2-mec-srvy-epht89d files
+
+Encoding a search for mms3_mec_srvy_l2_epht89d_\d{8}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms3/mec/srvy/l2
+* * * * * * * * * *
+Found 938 mms3-mec-srvy-epht89d files
+
+Encoding a search for mms4_mec_srvy_l2_epht89d_\d{8}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms4/mec/srvy/l2
+* * * * * * * * * *
+Found 938 mms4-mec-srvy-epht89d files
+
+Encoding a search for mms1_mec_srvy_l2_epht89q_\d{8}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms1/mec/srvy/l2
+* * * * * * * * *
+Found 938 mms1-mec-srvy-epht89q files
+
+Encoding a search for mms2_mec_srvy_l2_epht89q_\d{8}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms2/mec/srvy/l2
+* * * * * * * * *
+Found 938 mms2-mec-srvy-epht89q files
+
+Encoding a search for mms3_mec_srvy_l2_epht89q_\d{8}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms3/mec/srvy/l2
+* * * * * * * * * *
+Found 938 mms3-mec-srvy-epht89q files
+
+Encoding a search for mms4_mec_srvy_l2_epht89q_\d{8}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms4/mec/srvy/l2
+* * * * * * * * * *
+Found 938 mms4-mec-srvy-epht89q files
+
+Encoding a search for mms1_mec_srvy_l2_ephts04d_\d{8}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms1/mec/srvy/l2
+* * * * * * * * *
+Found 938 mms1-mec-srvy-ephts04d files
+
+Encoding a search for mms2_mec_srvy_l2_ephts04d_\d{8}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms2/mec/srvy/l2
+* * * * * * * * *
+Found 938 mms2-mec-srvy-ephts04d files
+
+Encoding a search for mms3_mec_srvy_l2_ephts04d_\d{8}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms3/mec/srvy/l2
+* * * * * * * * * *
+Found 938 mms3-mec-srvy-ephts04d files
+
+Encoding a search for mms4_mec_srvy_l2_ephts04d_\d{8}_v+\d.+\d.+\d.cdf!
+Starting scrape in /fpiprd1/data/ftp/mms4/mec/srvy/l2
+* * * * * * * * * *
+Found 936 mms4-mec-srvy-ephts04d files
+
