@@ -1,6 +1,6 @@
 import numpy as np
 from copy import deepcopy 
-#########################################################################################
+###########################################################################
 #    equation_of_time.py has a set of utility functions that perform basic 
 #       time-related tasks
 #       
@@ -10,14 +10,14 @@ from copy import deepcopy
 #       Meeus or [1]
 #       
 #       The calculation of GMST is taken from 'Approximate Sidereal Time' '
-#       from http://aa.usno.navy.mil/faq/docs/GAST.php - hereafter refered to 
-#       as [2]
+#       from http://aa.usno.navy.mil/faq/docs/GAST.php - hereafter refered 
+#       to as [2]
 #          
-#       The time standard is Gregorian calendar format with UTC time standard
-#       deg = pi/180
-
-
-#########################################################################################
+#       The time standard is Gregorian calendar format with UTC time 
+#       system
+#
+#        deg = pi/180
+############################################################################
 def DecimalDay(epoch_dict):
 
     day  = epoch_dict['day']
@@ -29,7 +29,7 @@ def DecimalDay(epoch_dict):
 
     return decimal_day
 
-#########################################################################################
+############################################################################
 def JulianDates(epoch_dict):
 
     #unpack the epoch_dict for convenience (notation follows Eq. 4 of [1]
@@ -56,7 +56,7 @@ def JulianDates(epoch_dict):
     return jul_day, T
 
     
-#########################################################################################
+############################################################################
 def calculate_obliquity(T):
 
     #Calculate the obliquity
@@ -68,7 +68,7 @@ def calculate_obliquity(T):
     return obliquity
 
     
-#########################################################################################    
+############################################################################    
 def calculate_GMST(epoch_dict):
 
     #Get current Julian date and centuries since J2000.0 Epoch
