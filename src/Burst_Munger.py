@@ -1,7 +1,10 @@
 import numpy as np
 from spacepy import pycdf
 
-#configuration data- directories
+#configuration data - observatory
+obs           = '' 
+
+#configuration data - directories
 obs_path      = ''
 fast_path     = ''
 brst_path     = ''
@@ -28,8 +31,17 @@ scpot_delta = 0.001
 
 
 #############################################################################
-def config_directories(basedir,obs,year,month,day):
-    #configuration data- directories
+def config_directories(basedir,selected_obs,year,month,day):
+    #configuration data - obsevatory
+    global obs
+    obs = selected_obs
+
+    #configuration data - directories
+    global obs_path, fast_path, brst_path
+    global bpsd_dir, epsd_dir, fgm_dir, fpi_emoms_dir, fpi_imoms_dir
+    global fgm_pre, fgm_post, fpi_emoms_pre, fpi_imoms_pre, fpi_post
+    global scpot_pre, scpot_post
+
     obs_path      = basedir+obs+'/'
     fast_path     = year+'/'+month+'/'
     brst_path     = year+'/'+month+'/'+day+'/'
@@ -51,18 +63,20 @@ def config_directories(basedir,obs,year,month,day):
     
 #############################################################################
 def make_Amoms(name):
-    Amoms = {'name'   :name,
-             'start'  :False,
-             'stop'   :False,
-             'bulk_vs':np.array([]),
-             'epochs' :np.array([]),
-             'ergs'   :np.array([]),
-             'heats'  :np.array([]),
-             'num_es' :np.array([]),          
-             'omnis'  :np.array([]),
-             'pres_s' :np.array([]),
-             'temp_s' :np.array([]),
-             'num_brsts':0}
+    Amoms = {'name'      :name,
+             'start'     :False,
+             'stop'      :False,
+             'bulk_vs'   :np.array([]),
+             'epochs'    :np.array([]),
+             'ergs'      :np.array([]),
+             'heats'     :np.array([]),
+             'num_den'   :np.array([]),          
+             'omnis'     :np.array([]),
+             'pres_s'    :np.array([]),
+             'T_par'     :np.array([]),
+             'T_perp'    :np.array([]),
+             'T_s'       :np.array([]),
+             'num_brsts' :0}
 
     return Amoms
 	
@@ -87,7 +101,9 @@ def munge_moms(epoch_strings,species):
         temp_num_e  = np.asarray(moms['%s_%s_numberdensity_brst' % (obs,species)])
         temp_omni   = np.asarray(moms['%s_%s_energyspectr_omni_brst' % (obs,species)])
         temp_pres   = np.asarray(moms['%s_%s_prestensor_gse_brst' % (obs,species)])
-        temp_temp   = np.asarray(moms['%s_%s_temptensor_gse_brst' % (obs,species)])
+        temp_T_par  = np.asarray(moms['%s_%s_temppara_brst' % (obs,species)])
+        temp_T_perp = np.asarray(moms['%s_%s_tempperp_brst' % (obs,species)])
+        temp_T      = np.asarray(moms['%s_%s_temptensor_gse_brst' % (obs,species)])
         if A['num_brsts'] == 0:
             A['start']      = temp_epoch[0]
             A['stop']       = temp_epoch[-1]
@@ -95,10 +111,12 @@ def munge_moms(epoch_strings,species):
             A['epochs']     = temp_epoch
             A['ergs']       = temp_erg
             A['heats']      = temp_heat
-            A['num_es']     = temp_num_e
+            A['num_den']    = temp_num_e
             A['omnis']      = temp_omni
             A['pres_s']     = temp_pres
-            A['temp_s']     = temp_temp            
+            A['T_par']      = temp_T_par
+            A['T_perp']     = temp_T_perp
+            A['T_s']        = temp_T            
             A['num_brsts'] += 1
         elif (temp_epoch[0] - A['stop']).total_seconds() < moms_delta:
             A['stop']       = temp_epoch[-1]
@@ -106,10 +124,12 @@ def munge_moms(epoch_strings,species):
             A['epochs']     = np.hstack((A['epochs'],temp_epoch))
             A['ergs']       = np.vstack((A['ergs'],temp_erg))
             A['heats']      = np.vstack((A['heats'],temp_heat))            
-            A['num_es']     = np.hstack((A['num_es'],temp_num_e))
+            A['num_den']    = np.hstack((A['num_den'],temp_num_e))
             A['omnis']      = np.vstack((A['omnis'],temp_omni))
             A['pres_s']     = np.vstack((A['pres_s'],temp_pres))
-            A['temp_s']     = np.vstack((A['temp_s'],temp_temp))
+            A['T_par']      = np.hstack((A['T_par'],temp_T_par))
+            A['T_perp']     = np.hstack((A['T_perp'],temp_T_perp))
+            A['T_s']        = np.vstack((A['T_s'],temp_T))
             A['num_brsts'] += 1
         elif (temp_epoch[0] - A['stop']).total_seconds() > moms_delta:
             B.append(A)
@@ -121,12 +141,16 @@ def munge_moms(epoch_strings,species):
             A['epochs']     = temp_epoch
             A['ergs']       = temp_erg
             A['heats']      = temp_heat
-            A['num_es']     = temp_num_e
+            A['num_den']    = temp_num_e
             A['omnis']      = temp_omni
             A['pres_s']     = temp_pres
-            A['temp_s']     = temp_temp            
+            A['T_par']      = temp_T_par
+            A['T_perp']     = temp_T_perp
+            A['T_s']        = temp_T            
             A['num_brsts'] += 1
     B.append(A)
+    for i in range(len(B)):
+        B[i]['trace_p'] = np.array([np.trace(B[i]['pres_s'][j]) for j in range(len(B[i]['epochs']))])
     return B
 	
 #############################################################################
