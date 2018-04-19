@@ -225,11 +225,11 @@ def config_directories(basedir):
        Returns:
           dictionary with the following keys (<n> = 1,2,3,4 - for mms<n>):
 
-              dsp_bpsd<n>:           search_dir for dsp for electric field
+              dsp_fast_bpsd<n>:      search_dir for dsp for electric field
                                      for mms<n>
-              dsp_epsd<n>:           search_dir for dsp for electric field
+              dsp_fast_epsd<n>:      search_dir for dsp for electric field
                                      for mms<n>
-              edp_scpot<n>:          search_dir for fast s/c potential 
+              edp_fast_scpot<n>:     search_dir for fast s/c potential 
                                      for mms<n>
               fgm_brst<n>:           search_dir for fgm burst for mms<n>
               fgm_srvy<n>:           search_dir for fgm survey for mms<n>
@@ -265,6 +265,7 @@ def config_directories(basedir):
         search_dirs['dsp_fast_bpsd'+obs_num]       = obs_path+'dsp/fast/l2/bpsd/'
         search_dirs['dsp_fast_epsd'+obs_num]       = obs_path+'dsp/fast/l2/epsd/'
         search_dirs['edp_fast_scpot'+obs_num]      = obs_path+'edp_spdf/fast/l2/scpot/'
+        search_dirs['edp_brst_dce'+obs_num]        = obs_path+'edp_spdf/brst/l2/dce/'
         search_dirs['fgm_brst'+obs_num]            = obs_path+'fgm/brst/l2/'
         search_dirs['fgm_srvy'+obs_num]            = obs_path+'fgm/brst/l2/srvy/l2/'    
         search_dirs['fpi_brst_des-dist'+obs_num]   = obs_path+'fpi/brst/l2/des-dist/'
@@ -363,10 +364,9 @@ def get_my_l2_files(obs,instrument,mode,descriptor,base_dir):
 
     my_pattern = construct_file_selector(obs,instrument,mode,'l2',descriptor,timestamp)
     my_list    = scrape_files(my_pattern,search_dir)
-    print '\n'
     my_dict    = construct_file_dict(my_list)    
-    print 'Found %s unique files' % (len(my_dict.keys()))
-
+    print '\nFound %s unique files in %s\n' % (len(my_dict.keys()),search_dir)
+    
     return my_dict               
 
 ###############################################################################
