@@ -48,14 +48,14 @@ def pos_on_time_axis(fig,ax,cursor,fpi_prd1,obs,mode,descriptor,year,month,day):
 ###############################################################################
 def make_density_panel(ax,obs,emoms_munge,imoms_munge):
     #determine the number of segments 
-    num_esegs = len(emoms_munge)
-    num_isegs = len(imoms_munge)
-    if num_esegs != num_isegs:
+    num_estrides = len(emoms_munge)
+    num_istrides = len(imoms_munge)
+    if num_estrides != num_istrides:
         print "Burst segments for electrons and ions don't match!"
         print "Terminating with extreme prejudice!!!"
         return False
     else:
-        num_segs = num_esegs
+        num_strides = num_estrides
        
     #graph and label the first segment
     te1 = emoms_munge[0]['epochs']
@@ -67,7 +67,7 @@ def make_density_panel(ax,obs,emoms_munge,imoms_munge):
     n_trace.customize_li(0,{'color':'black','label':'Ne'})
     n_trace.customize_li(1,{'color':'green','label':'Ni'})
     
-    for j in range(1,num_segs):
+    for j in range(1,num_strides):
         tej = emoms_munge[j]['epochs']
         nej = emoms_munge[j]['num_den']
         tij = imoms_munge[j]['epochs']
@@ -84,14 +84,14 @@ def make_density_panel(ax,obs,emoms_munge,imoms_munge):
 ###############################################################################
 def make_temperature_panel(ax,obs,emoms_munge,imoms_munge):
     #determine the number of segments
-    num_esegs = len(emoms_munge)
-    num_isegs = len(imoms_munge)
-    if num_esegs != num_isegs:
+    num_estrides = len(emoms_munge)
+    num_istrides = len(imoms_munge)
+    if num_estrides != num_istrides:
         print "Burst segments for electrons and ions don't match!"
         print "Terminating with extreme prejudice!!!"
         return False
     else:
-        num_segs = num_esegs
+        num_strides = num_estrides
        
     #graph and label the first segment
     te1      = emoms_munge[0]['epochs']
@@ -109,7 +109,7 @@ def make_temperature_panel(ax,obs,emoms_munge,imoms_munge):
     T_trace.customize_li(2,{'color':'black','label':'Ti_perp'})
     T_trace.customize_li(3,{'color':'green','label':'Ti_par'})
     
-    for j in range(1,num_segs):
+    for j in range(1,num_strides):
         tej      = emoms_munge[j]['epochs']
         Te_perpj = emoms_munge[j]['T_perp']
         Te_parj  = emoms_munge[j]['T_par']
@@ -133,14 +133,14 @@ def make_temperature_panel(ax,obs,emoms_munge,imoms_munge):
 ###############################################################################
 def make_Vvector_panel(ax,obs,emoms_munge,imoms_munge):
     #determine the number of segments
-    num_esegs = len(emoms_munge)
-    num_isegs = len(imoms_munge)
-    if num_esegs != num_isegs:
+    num_estrides = len(emoms_munge)
+    num_istrides = len(imoms_munge)
+    if num_estrides != num_istrides:
         print "Burst segments for electrons and ions don't match!"
         print "Terminating with extreme prejudice!!!"
         return False
     else:
-        num_segs = num_esegs
+        num_strides = num_estrides
        
     #graph and label the first segment
     te1      = emoms_munge[0]['epochs']
@@ -164,7 +164,7 @@ def make_Vvector_panel(ax,obs,emoms_munge,imoms_munge):
     V_trace.customize_li(4,{'color':'blue', 'label':'Vyi_gse','linestyle':'--'})
     V_trace.customize_li(5,{'color':'green','label':'Vzi_gse','linestyle':'--'})
 
-    for j in range(1,num_segs):
+    for j in range(1,num_strides):
         tej      = emoms_munge[j]['epochs']
         Vxej     = emoms_munge[j]['bulk_vs'][:,0]
         Vyej     = emoms_munge[j]['bulk_vs'][:,1]
@@ -196,7 +196,7 @@ def make_Vvector_panel(ax,obs,emoms_munge,imoms_munge):
 def make_sVvector_panel(ax,obs,smoms_munge,species):
 
     #determine the number of segments
-    num_segs = len(smoms_munge)
+    num_strides = len(smoms_munge)
        
     #graph and label the first segment
     ts1      = smoms_munge[0]['epochs']
@@ -210,7 +210,7 @@ def make_sVvector_panel(ax,obs,smoms_munge,species):
     V_trace.customize_li(1,{'color':'blue', 'label':'Vye_gse','linestyle':'-'})
     V_trace.customize_li(2,{'color':'green','label':'Vze_gse','linestyle':'-'})
 
-    for j in range(1,num_segs):
+    for j in range(1,num_strides):
         tsj      = smoms_munge[j]['epochs']
         Vxsj     = smoms_munge[j]['bulk_vs'][:,0]
         Vysj     = smoms_munge[j]['bulk_vs'][:,1]
@@ -230,14 +230,14 @@ def make_sVvector_panel(ax,obs,smoms_munge,species):
 ###############################################################################    
 def make_Et_panel(fig,ax,obs,smoms_munge,species,sc_pot):
     #determine the number of segments
-    num_segs = len(smoms_munge)
+    num_strides = len(smoms_munge)
 
     s1 = np.ma.masked_invalid(np.log10(smoms_munge[0]['omnis'])).T
     t1 = smoms_munge[0]['epochs']
     E1 = smoms_munge[0]['ergs'][0,:]
     Et_spec = Grapher.patch(ax,t1,E1,s1,4,8)
     
-    for j in range(1,num_segs):
+    for j in range(1,num_strides):
         sj = np.ma.masked_invalid(np.log10(smoms_munge[j]['omnis'])).T
         tj = smoms_munge[j]['epochs']
         Ej = smoms_munge[j]['ergs'][0,:]
@@ -256,7 +256,7 @@ def make_Et_panel(fig,ax,obs,smoms_munge,species,sc_pot):
 ###############################################################################
 def make_Bvector_panel(ax,obs,Bmunge):
     #determine the number of segments
-    num_segs = len(Bmunge)
+    num_strides = len(Bmunge)
     
     #graph and label the first segment
     t0  = Bmunge[0]['epochs']
@@ -271,7 +271,7 @@ def make_Bvector_panel(ax,obs,Bmunge):
     Bvector.customize_li(1,{'color':'green', 'label':'By_GSE'})
     Bvector.customize_li(2,{'color':'red',   'label':'Bz_GSE'})   
     
-    for i in range(1,num_segs):
+    for i in range(1,num_strides):
         ti  = Bmunge[i]['epochs']
         Bxi = Bmunge[i]['Bgse'][:,0]
         Byi = Bmunge[i]['Bgse'][:,1]
