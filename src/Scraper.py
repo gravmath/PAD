@@ -214,7 +214,7 @@ def format_timestamp(timestamp):
                timestamp[8:10]+':'+timestamp[10:12]+':'+timestamp[12:14]
                
 #############################################################################
-def config_directories(basedir):
+def config_directories(basedir,file_source):
     """A helper function design to help set the appropriate search_dirs
        for the various instruments.
        
@@ -252,7 +252,7 @@ def config_directories(basedir):
               mec_srvy_epht89d<n>:   search_dir for mec survey
      
        Example use:  
-           my_search_dict = config_directories('z:/data/ftp/')
+           my_search_dict = config_directories('z:/data/ftp/','server')
        
        Note:  Only l2 directories encoded
     """
@@ -264,8 +264,6 @@ def config_directories(basedir):
        
         search_dirs['dsp_fast_bpsd'+obs_num]       = obs_path+'dsp/fast/l2/bpsd/'
         search_dirs['dsp_fast_epsd'+obs_num]       = obs_path+'dsp/fast/l2/epsd/'
-        search_dirs['edp_fast_scpot'+obs_num]      = obs_path+'edp_spdf/fast/l2/scpot/'
-        search_dirs['edp_brst_dce'+obs_num]        = obs_path+'edp_spdf/brst/l2/dce/'
         search_dirs['fgm_brst'+obs_num]            = obs_path+'fgm/brst/l2/'
         search_dirs['fgm_srvy'+obs_num]            = obs_path+'fgm/brst/l2/srvy/l2/'    
         search_dirs['fpi_brst_des-dist'+obs_num]   = obs_path+'fpi/brst/l2/des-dist/'
@@ -277,6 +275,17 @@ def config_directories(basedir):
         search_dirs['fpi_fast_des-moms'+obs_num]   = obs_path+'fpi/fast/l2/des-moms/'
         search_dirs['fpi_fast_dis-moms'+obs_num]   = obs_path+'fpi/fast/l2/dis-moms/'
         search_dirs['mec_srvy_epht89d'+obs_num]    = obs_path+'mec/srvy/l2/epht89d/'
+        if file_source == 'server':
+            search_dirs['edp_fast_scpot'+obs_num]      = obs_path+'edp_spdf/fast/l2/scpot/'
+            search_dirs['edp_brst_dce'+obs_num]        = obs_path+'edp_spdf/brst/l2/dce/'
+            search_dirs['hpca_brst_ion'+obs_num]       = obs_path+'hpca_spdf/brst/l2/ion/'        
+            search_dirs['hpca_brst_moments'+obs_num]   = obs_path+'hpca_spdf/brst/l2/moments/'        
+        if file_source == 'local':
+            search_dirs['edp_fast_scpot'+obs_num]      = obs_path+'edp/fast/l2/scpot/'
+            search_dirs['edp_brst_dce'+obs_num]        = obs_path+'edp/brst/l2/dce/'
+            search_dirs['hpca_brst_ion'+obs_num]       = obs_path+'hpca/brst/l2/ion/'        
+            search_dirs['hpca_brst_moments'+obs_num]   = obs_path+'hpca/brst/l2/moments/'        
+        
  
     return search_dirs
                
@@ -316,7 +325,7 @@ def get_my_files(obs,instrument,mode,level,descriptor,timestamp,search_dir):
     return my_dict               
 
 ###############################################################################
-def get_my_l2_files(obs,instrument,mode,descriptor,base_dir):
+def get_my_l2_files(obs,instrument,mode,descriptor,base_dir,file_source):
     """The core function for creating a dictionary of file indices that
        meet certain parameters.
        
@@ -344,7 +353,7 @@ def get_my_l2_files(obs,instrument,mode,descriptor,base_dir):
     """
 
     obs_num    = obs[-1]
-    my_dirs    = config_directories(base_dir)
+    my_dirs    = config_directories(base_dir,file_source)
 
     if descriptor == '':
         my_key = instrument+'_'+mode+obs_num
@@ -353,7 +362,7 @@ def get_my_l2_files(obs,instrument,mode,descriptor,base_dir):
 
     if instrument in ['dsp','bpsd','epsd','mec']:
         timestamp = 8
-    if instrument in ['edp','edp_spdf','scpot','fpi']:
+    if instrument in ['edp','edp_spdf','hpca','hpca_spdf','scpot','fpi']:
         timestamp = 14
     if instrument == 'fgm' and mode == 'brst':
         timestamp = 14

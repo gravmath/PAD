@@ -1,45 +1,97 @@
 import numpy as np
 from spacepy import pycdf
 
-#configuration - time deltas
-dce_delta   = 0.001
+#configuration - time deltas (burst)
+bpsd_delta  = 2.5
+epsd_delta  = 2.5
+scpot_delta = 0.001
+dce_delta   = 0.00015
+fgm_delta   = 0.008
 des_delta   = 0.031
 dis_delta   = 0.151
-fgm_delta   = 0.008
-scpot_delta = 0.001
 
 #translations
+
+#dsp (2)
+bpsd_translation = {'epochs':['Epoch','null'],
+                    'freqs' :['"%s_b_freq" %(obs,)','eval'],
+                    'bpsd'  :['"%s_dsp_bpsd_omni_fast_l2" % (obs,)','eval']}
+
+epsd_translation = {'epochs':['Epoch','null'],
+                    'freqs' :['"%s_e_freq" %(obs,)','eval'],
+                    'bpsd'  :['"%s_dsp_epsd_omni_fast_l2" % (obs,)','eval']}
+
+#edp (2)
 dce_translation = {'epochs':['"%s_edp_epoch_brst_l2" % (obs,)','eval'],
                    'Egse'  :['"%s_edp_dce_gse_brst_l2" % (obs,)','eval']}
-                   
+
+scpot_translation = {'epochs' : ['"%s_edp_epoch_fast_l2" % (obs,)','eval'],
+                     'scpot'  : ['"%s_edp_scpot_fast_l2" % (obs,)','eval']}
+
+
+
+#fgm (1)
 fgm_translation = {'epochs':['Epoch','null'],
+                   'Bbcs'  :['"%s_fgm_b_bcs_brst_l2" % (obs,)','eval'],
                    'Bgse'  :['"%s_fgm_b_gse_brst_l2" % (obs,)','eval'],
                    'Bgsm'  :['"%s_fgm_b_gsm_brst_l2" % (obs,)','eval']}
 
+#fpi (4)
+edist_translation = {'epochs'    :['Epoch','null'],
+                     'dist'      :['"%s_%s_dist_brst" % (obs,"des")','eval'],
+                     'disterr'   :['"%s_%s_disterr_brst" % (obs,"des")','eval'],
+                     'ergs'      :['"%s_%s_energy_brst" % (obs,"des")','eval'],
+                     'phis'      :['"%s_%s_phi_brst" % (obs,"des")','eval'],
+                     'start_dphi':['"%s_%s_startdelphi_count_brst" % (obs,"des")','eval'],
+                     'thetas'    :['"%s_%s_theta_brst" % (obs,"des")','eval']}
                
-fpi_emoms_translation = {'epochs' :['Epoch','null'],
-                         'bulk_vs':['"%s_%s_bulkv_gse_brst" % (obs,"des")','eval'],
-                         'ergs'   :['"%s_%s_energy_brst" % (obs,"des")','eval'],
-                         'heats'  :['"%s_%s_heatq_gse_brst" % (obs,"des")','eval'],
-                         'num_den':['"%s_%s_numberdensity_brst" % (obs,"des")','eval'],
-                         'omnis'  :['"%s_%s_energyspectr_omni_brst" % (obs,"des")','eval'],
-                         'pres_s' :['"%s_%s_prestensor_gse_brst" % (obs,"des")','eval'],
-                         'T_par'  :['"%s_%s_temppara_brst" % (obs,"des")','eval'],
-                         'T_perp' :['"%s_%s_tempperp_brst" % (obs,"des")','eval'],
-                         'T_s'    :['"%s_%s_temptensor_gse_brst" % (obs,"des")','eval'] }
-                
-fpi_imoms_translation = {'epochs' :['Epoch','null'],
-                         'bulk_vs':['"%s_%s_bulkv_gse_brst" % (obs,"dis")','eval'],
-                         'ergs'   :['"%s_%s_energy_brst" % (obs,"dis")','eval'],
-                         'heats'  :['"%s_%s_heatq_gse_brst" % (obs,"dis")','eval'],
-                         'num_den':['"%s_%s_numberdensity_brst" % (obs,"dis")','eval'],
-                         'omnis'  :['"%s_%s_energyspectr_omni_brst" % (obs,"dis")','eval'],
-                         'pres_s' :['"%s_%s_prestensor_gse_brst" % (obs,"dis")','eval'],
-                         'T_par'  :['"%s_%s_temppara_brst" % (obs,"dis")','eval'],
-                         'T_perp' :['"%s_%s_tempperp_brst" % (obs,"dis")','eval'],
-                         'T_s'    :['"%s_%s_temptensor_gse_brst" % (obs,"dis")','eval'] }      
+idist_translation = {'epochs'    :['Epoch','null'],
+                     'dist'      :['"%s_%s_dist_brst" % (obs,"dis")','eval'],
+                     'disterr'   :['"%s_%s_disterr_brst" % (obs,"dis")','eval'],
+                     'ergs'      :['"%s_%s_energy_brst" % (obs,"dis")','eval'],
+                     'phis'      :['"%s_%s_phi_brst" % (obs,"dis")','eval'],
+                     'start_dphi':['"%s_%s_startdelphi_count_brst" % (obs,"dis")','eval'],
+                     'thetas'    :['"%s_%s_theta_brst" % (obs,"dis")','eval']}                   
+               
+emoms_translation = {'epochs' :['Epoch','null'],
+                     'bulk_vs':['"%s_%s_bulkv_gse_brst" % (obs,"des")','eval'],
+                     'ergs'   :['"%s_%s_energy_brst" % (obs,"des")','eval'],
+                     'heats'  :['"%s_%s_heatq_gse_brst" % (obs,"des")','eval'],
+                     'num_den':['"%s_%s_numberdensity_brst" % (obs,"des")','eval'],
+                     'omnis'  :['"%s_%s_energyspectr_omni_brst" % (obs,"des")','eval'],
+                     'pres_s' :['"%s_%s_prestensor_gse_brst" % (obs,"des")','eval'],
+                     'T_par'  :['"%s_%s_temppara_brst" % (obs,"des")','eval'],
+                     'T_perp' :['"%s_%s_tempperp_brst" % (obs,"des")','eval'],
+                     'T_s'    :['"%s_%s_temptensor_gse_brst" % (obs,"des")','eval'] }
+            
+imoms_translation = {'epochs' :['Epoch','null'],
+                     'bulk_vs':['"%s_%s_bulkv_gse_brst" % (obs,"dis")','eval'],
+                     'ergs'   :['"%s_%s_energy_brst" % (obs,"dis")','eval'],
+                     'heats'  :['"%s_%s_heatq_gse_brst" % (obs,"dis")','eval'],
+                     'num_den':['"%s_%s_numberdensity_brst" % (obs,"dis")','eval'],
+                     'omnis'  :['"%s_%s_energyspectr_omni_brst" % (obs,"dis")','eval'],
+                     'pres_s' :['"%s_%s_prestensor_gse_brst" % (obs,"dis")','eval'],
+                     'T_par'  :['"%s_%s_temppara_brst" % (obs,"dis")','eval'],
+                     'T_perp' :['"%s_%s_tempperp_brst" % (obs,"dis")','eval'],
+                     'T_s'    :['"%s_%s_temptensor_gse_brst" % (obs,"dis")','eval'] }  
+                         
+#hpca (2)
+#coming whenever
+     
+#mec (1)
+mec_translation = {'epochs'    : ['Epoch','null'],
+                   'fieldline' : ['"%s_mec_fieldline_type" % (obs,)','eval'],
+                   'losscone_n': ['"%s_mec_loss_cone_angle_n" %(obs,)','eval'],
+                   'losscone_s': ['"%s_mec_loss_cone_angle_s" %(obs,)','eval'],
+                   'gsw_pos'   : ['"%s_mec_r_gse" % (obs,)','eval'],
+                   'gsm_pos'   : ['"%s_mec_r_gsm" % (obs,)','eval'],
+                   'sm_pos'    : ['"%s_mec_r_sm" % (obs,)','eval']}
+                         
+
 
                          
+
+'''                         
 #############################################################################
 def make_dce_dict(name):
     """Helper function for making a dce data dictionary.
@@ -553,6 +605,8 @@ def bisect_epochs(target_epoch,epochs):
             low_index  = low_index - 1
 
     return low_index, high_index
+    
+'''
 
 ###############################################################################	
 #
@@ -580,6 +634,8 @@ def make_data_dict_via_translation(name,translation):
     
 #############################################################################
 def make_munge_via_translation(obs,type,delta,file_list,translation):
+    """Core function that uses an instrument-tailored hash to make a generic
+      munge of all the data fed it in file_list"""
 
     B       = []
     counter = 1
@@ -633,8 +689,12 @@ def make_munge_via_translation(obs,type,delta,file_list,translation):
                 A['stop']   = temp['epochs'][-1]
             for k in translation.keys():
                 num_dim = len(temp[k].shape)
-                if num_dim == 1:
+                if num_dim == 1 and temp[k].shape == temp['epochs'].shape:
                     A[k] = np.hstack((A[k],temp[k][new_points]))
+                elif num_dim == 1 and temp[k].shape != temp['epochs'].shape:
+                    #special case where an oeverlap exists but the data
+                    #are non-record varying
+                    A[k] = np.hstack((A[k],temp[k]))
                 if num_dim > 1:
                     A[k] = np.vstack((A[k],temp[k][new_points]))
             A['num_segs']  += 1            
@@ -655,6 +715,30 @@ def make_munge_via_translation(obs,type,delta,file_list,translation):
     print 'Munged %s series for %s on %s!' % (len(B),type,obs)
     return B
     
+#############################################################################        
+def interpolate_to_epoch(source_epoch,source_data,target_epoch):
+    """Helper function that linearly interpolates a single time series 
+      (source_epoch and source_data) to the time knots of another series
+      (target_epoch)
+      
+      Assumes that the time-knots are python datetime objects so that it
+      can use matplotlib's date2num function
+      
+       No error checking is performed"""
+       
+    import matplotlib.dates  as mdates
+    import scipy.interpolate as interp
+
+    #construct the interpolant
+    interpolant = interp.interp1d(mdates.date2num(source_epoch),source_data,kind='slinear')
+    
+    #check the epoch range
+    good_indices              = np.where(np.logical_and(target_epoch > source_epoch[0],target_epoch < source_epoch[-1]))
+    target_data               = np.ones(target_epoch.shape)*np.nan
+    target_data[good_indices] = interpolant(mdates.date2num(target_epoch[good_indices]))
+    
+    return np.ma.masked_invalid(target_data)    
+    
 #############################################################################    
 def make_mimic_munge(munge):
     """Helper function that makes a munge identical in 
@@ -670,18 +754,79 @@ def make_mimic_munge(munge):
         #determine the flavor
         if 'dce' in munge[0]['name']:
             print 'dce flavored'
-            mimic.append(Munger.make_dce_dict('null'))
+            mimic.append(make_data_dict_via_translation('dce_mimic',dce_translation))
         if 'dist' in munge[0]['name']:
-            print 'dce flavored'
-            mimic.append(Munger.make_dist_dict('null'))            
+            print 'dist flavored'
+            mimic.append(make_data_dict_via_translation('dist_mimic',edist_translation))
         if 'fgm' in munge[0]['name']:
             print 'fgm flavored'
-            mimic.append(Munger.make_fgm_dict('null'))            
+            mimic.append(make_data_dict_via_translation('fgm_mimic',fgm_translation))
         if 'moms' in munge[0]['name']:
             print 'moms flavored'
-            mimic.append(Munger.make_moms_dict('null'))            
+            mimic.append(make_data_dict_via_translation('moms_mimic',emoms_translation))
         for k in munge[j].keys():
             if type(munge[j][k]) != type(np.array([])):
                 mimic[j][k] = copy.deepcopy(munge[j][k])
  
     return mimic
+    
+#############################################################################   
+def adapt_munge_to_munge(source_munge,target_munge):
+    """Core function designed to take two munges of the same form (i.e
+       several burst segments from a given time period) and to linearly
+       interpolate the data from the source one to the time-knots of the
+       target.  
+       
+       In doing so, a mimicked source_munge is returned with time-knots 
+       consistent with target_munge.
+       
+       The use case is to adapt fgm or dce data to des or dis time-knots
+       for JdotE or curlometery or the like."""
+       
+    import copy
+    
+    if len(source_munge) != len(target_munge):
+        print 'Direct adaptation of source_munge to target_munge not possible.'
+        print 'Terminating with extreme prejudice!!!'
+        
+    #make a mimic of the source_munge
+    mimic_munge = make_mimic_munge(source_munge)
+    
+    #determine the number of strides
+    num_strides = len(source_munge)
+    
+    for j in range(num_strides):
+        mimic_munge[j]['epochs'] = copy.deepcopy(target_munge[j]['epochs'])
+        
+    for j in range(num_strides):
+        source_epoch     = source_munge[j]['epochs']
+        target_epoch     = target_munge[j]['epochs']
+        num_target_times = len(target_epoch) 
+        for k in source_munge[j].keys():
+            if k != 'epochs' and type(source_munge[j][k]) == type(np.array([])):
+                #determine number of components (scale, vector, array, tensor...)
+                #assumes that the ordering is always time (k) vs. components
+                data_shape        = list(source_munge[j][k].shape)
+                component_shape   = tuple(data_shape[1:])
+                data_shape[0]     = num_target_times
+                data_shape        = tuple(data_shape)
+                num_dim           = len(component_shape)
+                mimic_munge[j][k] = np.zeros(data_shape)                
+                if num_dim == 1: #scalar or vector series
+                    for m in range(component_shape[0]):
+                        source_data = source_munge[j][k][:,m]
+                        mimic_munge[j][k][:,m] = interpolate_to_epoch(source_epoch,source_data,target_epoch)
+                if num_dim == 2: #rank-2 tensor series
+                    for m in range(component_shape[0]):
+                        for n in range(component_shape[1]):
+                            source_data = source_munge[j][k][:,m,n]
+                            mimic_munge[j][k][:,m,n] = interpolate_to_epoch(source_epoch,source_data,target_epoch)
+                if num_dim == 3: #distribution/skymap
+                    for m in range(component_shape[0]):
+                        for n in range(component_shape[1]):
+                            for p in range(component_shape[2]):
+                                source_data = source_munge[j][k][:,m,n,p]
+                                mimic_munge[j][k][:,m,n,p] = interpolate_to_epoch(source_epoch,source_data,target_epoch)
+                mimic_munge[j][k] = np.ma.masked_invalid(mimic_munge[j][k])
+                
+    return mimic_munge
