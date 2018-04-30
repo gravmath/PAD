@@ -2,26 +2,27 @@ import numpy as np
 from spacepy import pycdf
 
 #configuration - time deltas (burst)
-bpsd_delta  = 2.5
-epsd_delta  = 2.5
-scpot_delta = 0.001
-dce_delta   = 0.00015
-fgm_delta   = 0.008
-des_delta   = 0.031
-dis_delta   = 0.151
+bpsd_delta     = 2.5
+epsd_delta     = 2.5
+scpot_delta    = 0.001
+dce_delta      = 0.00015
+fgm_delta      = 0.008
+fgm_delta_fast = 1.0
+des_delta      = 0.031
+dis_delta      = 0.151
 
 #translations
 
-#dsp (2)
+#dsp (2) both fast
 bpsd_translation = {'epochs':['Epoch','null'],
-                    'freqs' :['"%s_b_freq" %(obs,)','eval'],
+                    'freqs' :['"%s_b_freq" %(obs,)','special'],
                     'bpsd'  :['"%s_dsp_bpsd_omni_fast_l2" % (obs,)','eval']}
 
 epsd_translation = {'epochs':['Epoch','null'],
-                    'freqs' :['"%s_e_freq" %(obs,)','eval'],
-                    'bpsd'  :['"%s_dsp_epsd_omni_fast_l2" % (obs,)','eval']}
+                    'freqs' :['"%s_e_freq" %(obs,)','special'],
+                    'epsd'  :['"%s_dsp_epsd_omni" % (obs,)','eval']}
 
-#edp (2)
+#edp (2) 
 dce_translation = {'epochs':['"%s_edp_epoch_brst_l2" % (obs,)','eval'],
                    'Egse'  :['"%s_edp_dce_gse_brst_l2" % (obs,)','eval']}
 
@@ -29,14 +30,18 @@ scpot_translation = {'epochs' : ['"%s_edp_epoch_fast_l2" % (obs,)','eval'],
                      'scpot'  : ['"%s_edp_scpot_fast_l2" % (obs,)','eval']}
 
 
-
-#fgm (1)
+#fgm (2) brst and fast
 fgm_translation = {'epochs':['Epoch','null'],
                    'Bbcs'  :['"%s_fgm_b_bcs_brst_l2" % (obs,)','eval'],
                    'Bgse'  :['"%s_fgm_b_gse_brst_l2" % (obs,)','eval'],
                    'Bgsm'  :['"%s_fgm_b_gsm_brst_l2" % (obs,)','eval']}
+                   
+fgm_translation_srvy = {'epochs':['Epoch','null'],
+                        'Bbcs'  :['"%s_fgm_b_bcs_srvy_l2" % (obs,)','eval'],
+                        'Bgse'  :['"%s_fgm_b_gse_srvy_l2" % (obs,)','eval'],
+                        'Bgsm'  :['"%s_fgm_b_gsm_srvy_l2" % (obs,)','eval']}                   
 
-#fpi (4)
+#fpi (8) e/i dist/moms brst/fast
 edist_translation = {'epochs'    :['Epoch','null'],
                      'dist'      :['"%s_%s_dist_brst" % (obs,"des")','eval'],
                      'disterr'   :['"%s_%s_disterr_brst" % (obs,"des")','eval'],
@@ -74,17 +79,56 @@ imoms_translation = {'epochs' :['Epoch','null'],
                      'T_par'  :['"%s_%s_temppara_brst" % (obs,"dis")','eval'],
                      'T_perp' :['"%s_%s_tempperp_brst" % (obs,"dis")','eval'],
                      'T_s'    :['"%s_%s_temptensor_gse_brst" % (obs,"dis")','eval'] }  
+                     
+edist_translation_fast = {'epochs'    :['Epoch','null'],
+                          'dist'      :['"%s_%s_dist_fast" % (obs,"des")','eval'],
+                          'disterr'   :['"%s_%s_disterr_fast" % (obs,"des")','eval'],
+                          'ergs'      :['"%s_%s_energy_fast" % (obs,"des")','eval'],
+                          'phis'      :['"%s_%s_phi_fast" % (obs,"des")','eval'],
+                          'start_dphi':['"%s_%s_startdelphi_count_fast" % (obs,"des")','eval'],
+                          'thetas'    :['"%s_%s_theta_fast" % (obs,"des")','eval']}
+               
+idist_translation_fast = {'epochs'    :['Epoch','null'],
+                          'dist'      :['"%s_%s_dist_fast" % (obs,"dis")','eval'],
+                          'disterr'   :['"%s_%s_disterr_fast" % (obs,"dis")','eval'],
+                          'ergs'      :['"%s_%s_energy_fast" % (obs,"dis")','eval'],
+                          'phis'      :['"%s_%s_phi_fast" % (obs,"dis")','eval'],
+                          'start_dphi':['"%s_%s_startdelphi_count_fast" % (obs,"dis")','eval'],
+                          'thetas'    :['"%s_%s_theta_fast" % (obs,"dis")','eval']}                   
+               
+emoms_translation_fast = {'epochs' :['Epoch','null'],
+                          'bulk_vs':['"%s_%s_bulkv_gse_fast" % (obs,"des")','eval'],
+                          'ergs'   :['"%s_%s_energy_fast" % (obs,"des")','eval'],
+                          'heats'  :['"%s_%s_heatq_gse_fast" % (obs,"des")','eval'],
+                          'num_den':['"%s_%s_numberdensity_fast" % (obs,"des")','eval'],
+                          'omnis'  :['"%s_%s_energyspectr_omni_fast" % (obs,"des")','eval'],
+                          'pres_s' :['"%s_%s_prestensor_gse_fast" % (obs,"des")','eval'],
+                          'T_par'  :['"%s_%s_temppara_fast" % (obs,"des")','eval'],
+                          'T_perp' :['"%s_%s_tempperp_fast" % (obs,"des")','eval'],
+                          'T_s'    :['"%s_%s_temptensor_gse_fast" % (obs,"des")','eval'] }
+            
+imoms_translation_fast = {'epochs' :['Epoch','null'],
+                          'bulk_vs':['"%s_%s_bulkv_gse_fast" % (obs,"dis")','eval'],
+                          'ergs'   :['"%s_%s_energy_fast" % (obs,"dis")','eval'],
+                          'heats'  :['"%s_%s_heatq_gse_fast" % (obs,"dis")','eval'],
+                          'num_den':['"%s_%s_numberdensity_fast" % (obs,"dis")','eval'],
+                          'omnis'  :['"%s_%s_energyspectr_omni_fast" % (obs,"dis")','eval'],
+                          'pres_s' :['"%s_%s_prestensor_gse_fast" % (obs,"dis")','eval'],
+                          'T_par'  :['"%s_%s_temppara_fast" % (obs,"dis")','eval'],
+                          'T_perp' :['"%s_%s_tempperp_fast" % (obs,"dis")','eval'],
+                          'T_s'    :['"%s_%s_temptensor_gse_fast" % (obs,"dis")','eval'] }                       
                          
 #hpca (2)
 #coming whenever
      
-#mec (1)
+#mec (1) always fast
 mec_translation = {'epochs'    : ['Epoch','null'],
                    'fieldline' : ['"%s_mec_fieldline_type" % (obs,)','eval'],
                    'losscone_n': ['"%s_mec_loss_cone_angle_n" %(obs,)','eval'],
                    'losscone_s': ['"%s_mec_loss_cone_angle_s" %(obs,)','eval'],
-                   'gsw_pos'   : ['"%s_mec_r_gse" % (obs,)','eval'],
+                   'gse_pos'   : ['"%s_mec_r_gse" % (obs,)','eval'],
                    'gsm_pos'   : ['"%s_mec_r_gsm" % (obs,)','eval'],
+                   'mlt'       : ['"%s_mec_mlt" % (obs,)','eval'],                   
                    'sm_pos'    : ['"%s_mec_r_sm" % (obs,)','eval']}
                          
 
@@ -654,6 +698,8 @@ def make_munge_via_translation(obs,type,delta,file_list,translation):
                 temp[k] = np.asarray(cdf[translation[k][0]])
             if translation[k][1] == 'eval':
                 temp[k] = np.asarray(cdf[eval(translation[k][0])])
+            if translation[k][1] == 'special':
+                temp[k] = np.asarray(cdf[eval(translation[k][0])][:])
         
         #close the cdf
         cdf.close()

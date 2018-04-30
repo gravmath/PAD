@@ -82,6 +82,36 @@ def make_density_panel(ax,obs,emoms_munge,imoms_munge):
     return n_trace
 
 ###############################################################################
+def make_sdensity_panel(ax,obs,smoms_munge,species):
+    #determine the number of strides 
+    num_strides = len(smoms_munge)
+       
+    #graph and label the first segment
+    ts1 = smoms_munge[0]['epochs']
+    ns1 = smoms_munge[0]['num_den']
+    n_trace = Grapher.curves(ax,ts1,ns1)
+    if species == 'emoms':
+        n_trace.customize_li(0,{'color':'black','label':'Ne'})
+    if species == 'imoms':
+        n_trace.customize_li(1,{'color':'green','label':'Ni'})
+    
+    for j in range(1,num_strides):
+        tsj = emoms_munge[j]['epochs']
+        nsj = emoms_munge[j]['num_den']
+        n_trace.add_line(tsj,nsj)
+        if species == 'emoms':
+            n_trace.customize_li(j+1,{'color':'black'})
+        if species == 'imoms':
+            n_trace.customize_li(j+2,{'color':'green'})
+    
+    if species == 'emoms':
+        n_trace.customize_ax({'ylabel':'%s\\n$N_e$\\n[$cm^{-3}$]'%obs})
+    if species == 'imoms':
+        n_trace.customize_ax({'ylabel':'%s\\n$N_i$\\n[$cm^{-3}$]'%obs})
+    #n_trace.show_legend()
+    return n_trace    
+    
+###############################################################################
 def make_temperature_panel(ax,obs,emoms_munge,imoms_munge):
     #determine the number of segments
     num_estrides = len(emoms_munge)
@@ -129,6 +159,46 @@ def make_temperature_panel(ax,obs,emoms_munge,imoms_munge):
     T_trace.show_legend()                          
     return T_trace                                           
 
+###############################################################################
+def make_stemperature_panel(ax,obs,smoms_munge,species):
+       
+    #determine the number of strides
+    num_strides = len(smoms_munge)    
+       
+    #graph and label the first segment
+    ts1      = smoms_munge[0]['epochs']
+    Ts_perp1 = smoms_munge[0]['T_perp']
+    Ts_par1  = smoms_munge[0]['T_par']
+    T_trace = Grapher.curves(ax,ts1,Ts_perp1)
+    T_trace.add_line(ts1,Ts_par1)
+    if species == 'emoms':
+        T_trace.customize_li(0,{'color':'red', 'label':'$T_{e\perp}$'})
+        T_trace.customize_li(1,{'color':'blue','label':'$T_{e\parallel}$'})
+    if species == 'imoms':
+        T_trace.customize_li(2,{'color':'black','label':'$T_{i\perp}$'})
+        T_trace.customize_li(3,{'color':'green','label':'$T_{i\parallel}$'})
+    
+    for j in range(1,num_strides):
+        tsj      = smoms_munge[j]['epochs']
+        Ts_perpj = smoms_munge[j]['T_perp']
+        Ts_parj  = smoms_munge[j]['T_par']
+        T_trace.add_line(tsj,Ts_perpj)
+        T_trace.add_line(tsj,Ts_parj)
+        if species == 'emoms':
+            T_trace.customize_li(j+3,{'color':'red'})
+            T_trace.customize_li(j+4,{'color':'blue'})
+        if species == 'imoms':
+            T_trace.customize_li(j+3,{'color':'black'})
+            T_trace.customize_li(j+4,{'color':'green'})
+            
+    if species == 'emoms':
+        T_trace.customize_ax({'ylabel':'%s\\n$T_e$\\n[eV]'%obs,'ylim':[1,1e4],'yscale':'log'})
+    if species == 'imoms':
+        T_trace.customize_ax({'ylabel':'%s\\n$T_i$\\n[eV]'%obs,'ylim':[1,1e4],'yscale':'log'})
+
+    T_trace.show_legend()                          
+    return T_trace                                           
+    
     
 ###############################################################################
 def make_Vvector_panel(ax,obs,emoms_munge,imoms_munge):
@@ -206,9 +276,9 @@ def make_sVvector_panel(ax,obs,smoms_munge,species):
     V_trace  = Grapher.curves(ax,ts1,Vxs1)
     V_trace.add_line(ts1,Vys1)
     V_trace.add_line(ts1,Vzs1)
-    V_trace.customize_li(0,{'color':'red',  'label':'Vxe_gse','linestyle':'-'})
-    V_trace.customize_li(1,{'color':'blue', 'label':'Vye_gse','linestyle':'-'})
-    V_trace.customize_li(2,{'color':'green','label':'Vze_gse','linestyle':'-'})
+    V_trace.customize_li(0,{'color':'red',  'label':'$V_x (GSE)$','linestyle':'-'})
+    V_trace.customize_li(1,{'color':'blue', 'label':'$V_y (GSE)$','linestyle':'-'})
+    V_trace.customize_li(2,{'color':'green','label':'$V_z (GSE)$','linestyle':'-'})
 
     for j in range(1,num_strides):
         tsj      = smoms_munge[j]['epochs']
@@ -222,8 +292,10 @@ def make_sVvector_panel(ax,obs,smoms_munge,species):
         V_trace.customize_li(j+3, {'color':'blue', 'linestyle':'-'})
         V_trace.customize_li(j+4, {'color':'green','linestyle':'-'})
   
-    
-    V_trace.customize_ax({'ylabel':'%s\\n%s Velocity\\n[km/s]'%(obs,species)})    
+    if species == 'emoms':
+        V_trace.customize_ax({'ylabel':'%s\\n$V_e$\\n[km/s]'%(obs)})
+    if species == 'imoms':
+        V_trace.customize_ax({'ylabel':'%s\\n$V_i$\\n[km/s]'%(obs)})    
     V_trace.show_legend()
     return V_trace
     
@@ -249,7 +321,7 @@ def make_Et_panel(fig,ax,obs,smoms_munge,species,sc_pot):
     ax.set_yscale('log')
     #ax.plot(t,sc_pot,'w-',linewidth = 3)
     ax.set_ylabel('%s\n%s\nEnergy\n[eV]'%(obs,species))
-    Et_spec.cbar.set_label('keV/(cm^2 s sr keV)')
+    Et_spec.cbar.set_label('$keV/(cm^2 s sr keV)$')
 
     return Et_spec
     
@@ -260,16 +332,16 @@ def make_Bvector_panel(ax,obs,Bmunge):
     
     #graph and label the first segment
     t0  = Bmunge[0]['epochs']
-    Bx0 = Bmunge[0]['Bgse'][:,0]
-    By0 = Bmunge[0]['Bgse'][:,1]
-    Bz0 = Bmunge[0]['Bgse'][:,2]
+    Bx0 = Bmunge[0]['Bgsm'][:,0]
+    By0 = Bmunge[0]['Bgsm'][:,1]
+    Bz0 = Bmunge[0]['Bgsm'][:,2]
     
     Bvector = Grapher.curves(ax,t0,Bx0)
     Bvector.add_line(t0,By0)
     Bvector.add_line(t0,Bz0)
-    Bvector.customize_li(0,{'color':'blue',  'label':'Bx_GSE'})
-    Bvector.customize_li(1,{'color':'green', 'label':'By_GSE'})
-    Bvector.customize_li(2,{'color':'red',   'label':'Bz_GSE'})   
+    Bvector.customize_li(0,{'color':'blue',  'label':'$B_x (GSE)$'})
+    Bvector.customize_li(1,{'color':'green', 'label':'$B_y (GSE)$'})
+    Bvector.customize_li(2,{'color':'red',   'label':'$B_z (GSE)$'})   
     
     for i in range(1,num_strides):
         ti  = Bmunge[i]['epochs']
@@ -287,4 +359,35 @@ def make_Bvector_panel(ax,obs,Bmunge):
     Bvector.customize_ax({'ylabel':ylab})
     Bvector.show_legend()    
     return Bvector
+    
+###############################################################################    
+def make_psd_panel(fig,ax,obs,psd_munge,field):
+    #determine the number of segments
+    num_strides = len(psd_munge)
+
+    value_min = -11
+    value_max = -4
+    s1 = np.ma.masked_invalid(np.log10(psd_munge[0][field])).T
+    t1 = psd_munge[0]['epochs']
+    f1 = psd_munge[0]['freqs']
+    psdt_spec = Grapher.patch(ax,t1,f1,s1,value_min,value_max)
+    
+    for j in range(1,num_strides):
+        sj = np.ma.masked_invalid(np.log10(psd_munge[j][field])).T
+        tj = psd_munge[j]['epochs']
+        fj = psd_munge[j]['freqs']
+        ax.pcolormesh(tj,fj,sj,vmin=value_min,vmax=value_max,cmap=cmap.jet)
+    
+    cmap.jet.set_bad('k',alpha=1.0) 
+    psdt_spec.set_colormap(cmap.jet)
+    psdt_spec.add_colorbar(fig)
+    ax.set_yscale('log')
+    ax.set_ylabel('%s\nFreq\n[Hz]'%(obs))
+    if field == 'bpsd':
+        psdt_spec.cbar.set_label('$T^2/Hz$')
+    if field == 'epsd':
+        psdt_spec.cbar.set_label('$(V/m)^2/Hz$')
+    return psdt_spec    
+    
+    #'$10^{%d}$'
     

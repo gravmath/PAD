@@ -322,6 +322,8 @@ class curves(object):
             min_locator   = minor_tick_parms['loc'](minor_tick_parms['by'],interval=minor_tick_parms['int'])
             min_formatter = mdates.DateFormatter(minor_tick_parms['form'])
         if 'seconds' in tstyle:
+            if tstyle == 'seconds5':
+                min_locator   = mdates.SecondLocator(bysecond=range(0,60,5),interval=1)
             if tstyle == 'seconds10':
                 min_locator   = mdates.SecondLocator(bysecond=[0,10,20,30,40,50],interval=1)
             if tstyle == 'seconds15':
@@ -402,4 +404,68 @@ class patch(object):
         self.cbar_span = np.array(range(self.val_min,self.val_max+1))
         self.cax       = fig.add_axes(cbar_position(self.ax,self.cbar_off,self.cbar_wth))
         self.cbar      = fig.colorbar(self.patch,cax=self.cax,ticks=self.cbar_span,format=self.cbar_format)  
+    def format_ax_time(self,t,major_tick_parms,minor_tick_parms,tstyle='custom'):
+        if tstyle == 'custom':
+            maj_locator   = major_tick_parms['loc'](major_tick_parms['by'],interval=major_tick_parms['int'])
+            maj_formatter = mdates.DateFormatter(major_tick_parms['form'])
+            min_locator   = minor_tick_parms['loc'](minor_tick_parms['by'],interval=minor_tick_parms['int'])
+            min_formatter = mdates.DateFormatter(minor_tick_parms['form'])
+        if 'seconds' in tstyle:
+            if tstyle == 'seconds5':
+                min_locator   = mdates.SecondLocator(bysecond=range(0,60,5),interval=1)
+            if tstyle == 'seconds10':
+                min_locator   = mdates.SecondLocator(bysecond=[0,10,20,30,40,50],interval=1)
+            if tstyle == 'seconds15':
+                min_locator   = mdates.SecondLocator(bysecond=[0,15,30,45],interval=1)
+            if tstyle == 'seconds20':
+                min_locator   = mdates.SecondLocator(bysecond=[0,20,40],interval=1)
+            if tstyle == 'seconds30':
+                min_locator   = mdates.SecondLocator(bysecond=[0,30],interval=1)
+            maj_locator   = mdates.MinuteLocator()
+            maj_formatter = mdates.DateFormatter('%M')
+            min_formatter = mdates.DateFormatter('\n%S')
+        if 'minutes' in tstyle:
+            if tstyle == 'minutes5':
+                min_locator   = mdates.MinuteLocator(byminute=range(0,60,5),interval=1)
+            if tstyle == 'minutes10':
+                min_locator   = mdates.MinuteLocator(byminute=[0,10,20,30,40,50],interval=1)
+            if tstyle == 'minutes15':
+                min_locator   = mdates.MinuteLocator(byminute=[0,15,30,45],interval=1)
+            if tstyle == 'minutes20':
+                min_locator   = mdates.MinuteLocator(byminute=[0,20,40],interval=1)
+            if tstyle == 'minutes30':
+                min_locator   = mdates.MinuteLocator(byminute=[0,30],interval=1)
+            maj_locator = mdates.HourLocator()
+            maj_formatter = mdates.DateFormatter('%H')
+            min_formatter = mdates.DateFormatter('\n%M')
+        if 'hours' in tstyle:
+            if tstyle == 'hours':
+                min_locator   = mdates.HourLocator(byhour=range(24),interval=1)
+            if tstyle == 'hours2':
+                min_locator   = mdates.HourLocator(byhour=range(24,2),interval=1)
+            if tstyle == 'hours3':
+                min_locator   = mdates.HourLocator(byhour=range(24,3),interval=1)
+            if tstyle == 'hours4':
+                min_locator   = mdates.HourLocator(byhour=range(24,4),interval=1)
+            if tstyle == 'hours6':
+                min_locator   = mdates.HourLocator(byhour=range(24,6),interval=1)
+            if tstyle == 'hours8':
+                min_locator   = mdates.HourLocator(byhour=range(24,8),interval=1)
+            if tstyle == 'hours12':
+                min_locator   = mdates.HourLocator(byhour=range(24,12),interval=1)
+            maj_locator = mdates.DayLocator()
+            maj_formatter = mdates.DateFormatter('%d')
+            min_formatter = mdates.DateFormatter('\n%H')
+        self.ax.xaxis.set_major_locator(maj_locator)
+        self.ax.xaxis.set_major_formatter(maj_formatter)
+        self.ax.xaxis.set_minor_locator(min_locator)
+        self.ax.xaxis.set_minor_formatter(min_formatter)
+    def rotate_xticks(self,angle):
+        for tick in self.ax.get_xticklabels():
+            tick.set_rotation(angle)
+    def show_legend(self,location='best'):
+        self.ax.legend(loc=location)
+    def show_grid(self):
+        self.ax.grid('on')    
+
         
