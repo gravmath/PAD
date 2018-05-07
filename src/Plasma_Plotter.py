@@ -77,7 +77,7 @@ def make_density_panel(ax,obs,emoms_munge,imoms_munge):
         n_trace.customize_li(j+1,{'color':'black'})
         n_trace.customize_li(j+2,{'color':'green'})
         
-    n_trace.customize_ax({'ylabel':'%s\\ndensity\\n[cm^-3]'%obs})
+    n_trace.customize_ax({'ylabel':'%s\\ndensity\\n[$cm^{-3}$]'%obs})
     n_trace.show_legend()
     return n_trace
 
@@ -134,10 +134,10 @@ def make_temperature_panel(ax,obs,emoms_munge,imoms_munge):
     T_trace.add_line(te1,Te_par1)
     T_trace.add_line(ti1,Ti_perp1)
     T_trace.add_line(ti1,Ti_par1)
-    T_trace.customize_li(0,{'color':'red','label':'Te_perp'})
-    T_trace.customize_li(1,{'color':'blue','label':'Te_par'})
-    T_trace.customize_li(2,{'color':'black','label':'Ti_perp'})
-    T_trace.customize_li(3,{'color':'green','label':'Ti_par'})
+    T_trace.customize_li(0,{'color':'red','label':'$T_{e\perp}$'})
+    T_trace.customize_li(1,{'color':'blue','label':'$T_{e\parallel}$'})
+    T_trace.customize_li(2,{'color':'black','label':'$T_{i\perp}$'})
+    T_trace.customize_li(3,{'color':'green','label':'$T_{i\parallel}$'})
     
     for j in range(1,num_strides):
         tej      = emoms_munge[j]['epochs']

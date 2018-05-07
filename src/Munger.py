@@ -48,7 +48,7 @@ edist_translation = {'epochs'    :['Epoch','null'],
                      'ergs'      :['"%s_%s_energy_brst" % (obs,"des")','eval'],
                      'phis'      :['"%s_%s_phi_brst" % (obs,"des")','eval'],
                      'start_dphi':['"%s_%s_startdelphi_count_brst" % (obs,"des")','eval'],
-                     'thetas'    :['"%s_%s_theta_brst" % (obs,"des")','eval']}
+                     'thetas'    :['"%s_%s_theta_brst" % (obs,"des")','special']}
                
 idist_translation = {'epochs'    :['Epoch','null'],
                      'dist'      :['"%s_%s_dist_brst" % (obs,"dis")','eval'],
@@ -56,7 +56,7 @@ idist_translation = {'epochs'    :['Epoch','null'],
                      'ergs'      :['"%s_%s_energy_brst" % (obs,"dis")','eval'],
                      'phis'      :['"%s_%s_phi_brst" % (obs,"dis")','eval'],
                      'start_dphi':['"%s_%s_startdelphi_count_brst" % (obs,"dis")','eval'],
-                     'thetas'    :['"%s_%s_theta_brst" % (obs,"dis")','eval']}                   
+                     'thetas'    :['"%s_%s_theta_brst" % (obs,"dis")','special']}                   
                
 emoms_translation = {'epochs' :['Epoch','null'],
                      'bulk_vs':['"%s_%s_bulkv_gse_brst" % (obs,"des")','eval'],
@@ -86,7 +86,7 @@ edist_translation_fast = {'epochs'    :['Epoch','null'],
                           'ergs'      :['"%s_%s_energy_fast" % (obs,"des")','eval'],
                           'phis'      :['"%s_%s_phi_fast" % (obs,"des")','eval'],
                           'start_dphi':['"%s_%s_startdelphi_count_fast" % (obs,"des")','eval'],
-                          'thetas'    :['"%s_%s_theta_fast" % (obs,"des")','eval']}
+                          'thetas'    :['"%s_%s_theta_fast" % (obs,"des")','special']}
                
 idist_translation_fast = {'epochs'    :['Epoch','null'],
                           'dist'      :['"%s_%s_dist_fast" % (obs,"dis")','eval'],
@@ -94,7 +94,7 @@ idist_translation_fast = {'epochs'    :['Epoch','null'],
                           'ergs'      :['"%s_%s_energy_fast" % (obs,"dis")','eval'],
                           'phis'      :['"%s_%s_phi_fast" % (obs,"dis")','eval'],
                           'start_dphi':['"%s_%s_startdelphi_count_fast" % (obs,"dis")','eval'],
-                          'thetas'    :['"%s_%s_theta_fast" % (obs,"dis")','eval']}                   
+                          'thetas'    :['"%s_%s_theta_fast" % (obs,"dis")','special']}                   
                
 emoms_translation_fast = {'epochs' :['Epoch','null'],
                           'bulk_vs':['"%s_%s_bulkv_gse_fast" % (obs,"des")','eval'],
@@ -695,9 +695,9 @@ def make_munge_via_translation(obs,type,delta,file_list,translation):
         temp = make_data_dict_via_translation('temp',translation)
         for k in translation:
             if translation[k][1] == 'null':
-                temp[k] = np.asarray(cdf[translation[k][0]])
+                temp[k] = np.asarray(cdf[translation[k][0]][:])
             if translation[k][1] == 'eval':
-                temp[k] = np.asarray(cdf[eval(translation[k][0])])
+                temp[k] = np.asarray(cdf[eval(translation[k][0])][:])
             if translation[k][1] == 'special':
                 temp[k] = np.asarray(cdf[eval(translation[k][0])][:])
         
@@ -834,6 +834,7 @@ def adapt_munge_to_munge(source_munge,target_munge):
     if len(source_munge) != len(target_munge):
         print 'Direct adaptation of source_munge to target_munge not possible.'
         print 'Terminating with extreme prejudice!!!'
+        return False
         
     #make a mimic of the source_munge
     mimic_munge = make_mimic_munge(source_munge)

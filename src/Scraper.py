@@ -265,7 +265,7 @@ def config_directories(basedir,file_source):
         search_dirs['dsp_fast_bpsd'+obs_num]       = obs_path+'dsp/fast/l2/bpsd/'
         search_dirs['dsp_fast_epsd'+obs_num]       = obs_path+'dsp/fast/l2/epsd/'
         search_dirs['fgm_brst'+obs_num]            = obs_path+'fgm/brst/l2/'
-        search_dirs['fgm_srvy'+obs_num]            = obs_path+'fgm/brst/l2/srvy/l2/'    
+        search_dirs['fgm_srvy'+obs_num]            = obs_path+'fgm/srvy/l2/'    
         search_dirs['fpi_brst_des-dist'+obs_num]   = obs_path+'fpi/brst/l2/des-dist/'
         search_dirs['fpi_brst_dis-dist'+obs_num]   = obs_path+'fpi/brst/l2/dis-dist/'
         search_dirs['fpi_fast_des-dist'+obs_num]   = obs_path+'fpi/fast/l2/des-dist/'
@@ -366,7 +366,7 @@ def get_my_l2_files(obs,instrument,mode,descriptor,base_dir,file_source):
         timestamp = 14
     if instrument == 'fgm' and mode == 'brst':
         timestamp = 14
-    if instrument == 'fgm' and mode == 'fast':
+    if instrument == 'fgm' and mode == 'srvy':
         timestamp = 8
 
     search_dir = my_dirs[my_key]

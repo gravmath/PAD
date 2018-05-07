@@ -36,7 +36,7 @@ def inventory_file(filename,base_dir,download_dir):
     curr_dir = base_dir
     print pieces
     for p in pieces:
-        print curr_dir
+        #print curr_dir
         curr_dir = curr_dir+'/'+p
         if os.path.isdir(curr_dir):
             pass
@@ -76,13 +76,18 @@ my_files['mms1'] = {'bpsd_f':[],
                     'dce_b':[],
                     'scpot_f':[],
                     'fgm_b':[],
+                    'fgm_s':[],
                     'des_dist_b':[],
                     'des_moms_b':[],
                     'dis_dist_b':[],
                     'dis_moms_b':[],
+                    'des_dist_f':[],
+                    'des_moms_f':[],
+                    'dis_dist_f':[],
+                    'dis_moms_f':[],
                     'hpca_ion_b':[],
                     'hpca_moms_b':[],
-                    'mec_f':[]
+                    'mec_s':[]
                     }
 
 my_files['mms2'] = {'bpsd_f':[],
@@ -90,13 +95,18 @@ my_files['mms2'] = {'bpsd_f':[],
                     'dce_b':[],
                     'scpot_f':[],
                     'fgm_b':[],
+                    'fgm_s':[],
                     'des_dist_b':[],
                     'des_moms_b':[],
                     'dis_dist_b':[],
                     'dis_moms_b':[],
+                    'des_dist_f':[],
+                    'des_moms_f':[],
+                    'dis_dist_f':[],
+                    'dis_moms_f':[],
                     'hpca_ion_b':[],
                     'hpca_moms_b':[],
-                    'mec_f':[]
+                    'mec_s':[]
                     }
 
 my_files['mms3'] = {'bpsd_f':[],
@@ -104,13 +114,18 @@ my_files['mms3'] = {'bpsd_f':[],
                     'dce_b':[],
                     'scpot_f':[],
                     'fgm_b':[],
+                    'fgm_s':[],
                     'des_dist_b':[],
                     'des_moms_b':[],
                     'dis_dist_b':[],
                     'dis_moms_b':[],
+                    'des_dist_f':[],
+                    'des_moms_f':[],
+                    'dis_dist_f':[],
+                    'dis_moms_f':[],
                     'hpca_ion_b':[],
                     'hpca_moms_b':[],
-                    'mec_f':[]
+                    'mec_s':[]
                     }
 
 my_files['mms4'] = {'bpsd_f':[],
@@ -118,19 +133,26 @@ my_files['mms4'] = {'bpsd_f':[],
                     'dce_b':[],
                     'scpot_f':[],
                     'fgm_b':[],
+                    'fgm_s':[],
                     'des_dist_b':[],
                     'des_moms_b':[],
                     'dis_dist_b':[],
                     'dis_moms_b':[],
+                    'des_dist_f':[],
+                    'des_moms_f':[],
+                    'dis_dist_f':[],
+                    'dis_moms_f':[],
                     'hpca_ion_b':[],
                     'hpca_moms_b':[],
-                    'mec_f':[]
+                    'mec_s':[]
                     }
                     
 start_time_fast = prj_dict['start_time_fast']
 stop_time_fast  = prj_dict['stop_time_fast'] 
 start_time_brst = prj_dict['start_time_brst']
 stop_time_brst  = prj_dict['stop_time_brst']
+start_time_srvy = prj_dict['start_time_srvy']
+stop_time_srvy  = prj_dict['stop_time_srvy']
  
 for obs in observatories:
     if prj_dict['file source'] == 'server':
@@ -139,18 +161,20 @@ for obs in observatories:
         scanned_files_filename = 'c:/Users/cschiff/Documents/github/scanned_files_%s.local' % (obs,)
 
     if prj_dict['scan_or_load'] == 'scan':
+        print 'Preparing to scrape together files for %s from the %s drive and save to %s' % (obs, prj_dict['file source'],scanned_files_filename)
         bpsd_fast_dict         = Scraper.get_my_l2_files(obs,'dsp', 'fast','bpsd',    base_dir,prj_dict['file source'])
         epsd_fast_dict         = Scraper.get_my_l2_files(obs,'dsp', 'fast','epsd',    base_dir,prj_dict['file source'])
         dce_brst_dict          = Scraper.get_my_l2_files(obs,'edp', 'brst','dce',     base_dir,prj_dict['file source'])
         scpot_fast_dict        = Scraper.get_my_l2_files(obs,'edp', 'fast','scpot',   base_dir,prj_dict['file source'])
         fgm_brst_dict          = Scraper.get_my_l2_files(obs,'fgm', 'brst','',        base_dir,prj_dict['file source'])
+        fgm_srvy_dict          = Scraper.get_my_l2_files(obs,'fgm', 'srvy','',        base_dir,prj_dict['file source'])        
         fpi_brst_des_dist_dict = Scraper.get_my_l2_files(obs,'fpi', 'brst','des-dist',base_dir,prj_dict['file source'])
-        fpi_brst_dis_dist_dict = Scraper.get_my_l2_files(obs,'fpi', 'brst','dis-dist',base_dir,prj_dict['file source'])
-        fpi_fast_des_dist_dict = Scraper.get_my_l2_files(obs,'fpi', 'fast','des-dist',base_dir,prj_dict['file source'])
-        fpi_fast_dis_dist_dict = Scraper.get_my_l2_files(obs,'fpi', 'fast','dis-dist',base_dir,prj_dict['file source'])
         fpi_brst_des_moms_dict = Scraper.get_my_l2_files(obs,'fpi', 'brst','des-moms',base_dir,prj_dict['file source'])
+        fpi_brst_dis_dist_dict = Scraper.get_my_l2_files(obs,'fpi', 'brst','dis-dist',base_dir,prj_dict['file source'])
         fpi_brst_dis_moms_dict = Scraper.get_my_l2_files(obs,'fpi', 'brst','dis-moms',base_dir,prj_dict['file source'])
+        fpi_fast_des_dist_dict = Scraper.get_my_l2_files(obs,'fpi', 'fast','des-dist',base_dir,prj_dict['file source'])
         fpi_fast_des_moms_dict = Scraper.get_my_l2_files(obs,'fpi', 'fast','des-moms',base_dir,prj_dict['file source'])
+        fpi_fast_dis_dist_dict = Scraper.get_my_l2_files(obs,'fpi', 'fast','dis-dist',base_dir,prj_dict['file source'])
         fpi_fast_dis_moms_dict = Scraper.get_my_l2_files(obs,'fpi', 'fast','dis-moms',base_dir,prj_dict['file source'])
         hpca_brst_ion_dict     = Scraper.get_my_l2_files(obs,'hpca','brst','ion',     base_dir,prj_dict['file source'])
         hpca_brst_moments_dict = Scraper.get_my_l2_files(obs,'hpca','brst','moments', base_dir,prj_dict['file source'])
@@ -161,32 +185,35 @@ for obs in observatories:
         pickle.dump(dce_brst_dict,scanned_files)          
         pickle.dump(scpot_fast_dict,scanned_files)    
         pickle.dump(fgm_brst_dict,scanned_files)
+        pickle.dump(fgm_srvy_dict,scanned_files)        
         pickle.dump(fpi_brst_des_dist_dict,scanned_files) 
-        pickle.dump(fpi_brst_dis_dist_dict,scanned_files) 
-        pickle.dump(fpi_fast_des_dist_dict,scanned_files) 
-        pickle.dump(fpi_fast_dis_dist_dict,scanned_files) 
         pickle.dump(fpi_brst_des_moms_dict,scanned_files) 
+        pickle.dump(fpi_brst_dis_dist_dict,scanned_files) 
         pickle.dump(fpi_brst_dis_moms_dict,scanned_files) 
+        pickle.dump(fpi_fast_des_dist_dict,scanned_files) 
         pickle.dump(fpi_fast_des_moms_dict,scanned_files) 
+        pickle.dump(fpi_fast_dis_dist_dict,scanned_files) 
         pickle.dump(fpi_fast_dis_moms_dict,scanned_files) 
         pickle.dump(hpca_brst_ion_dict,scanned_files) 
         pickle.dump(hpca_brst_moments_dict,scanned_files)         
         pickle.dump(mec_srvy_epht89d_dict,scanned_files)
         scanned_files.close()
     else:
+        print 'Reading in scraped files for %s on the %s drive from %s' % (obs, prj_dict['file source'],scanned_files_filename)        
         scanned_files          = open(scanned_files_filename,"r")
         bpsd_fast_dict         = pickle.load(scanned_files)
         epsd_fast_dict         = pickle.load(scanned_files)
         dce_brst_dict          = pickle.load(scanned_files)
         scpot_fast_dict        = pickle.load(scanned_files)
         fgm_brst_dict          = pickle.load(scanned_files)
+        fgm_srvy_dict          = pickle.load(scanned_files)        
         fpi_brst_des_dist_dict = pickle.load(scanned_files)
-        fpi_brst_dis_dist_dict = pickle.load(scanned_files)
-        fpi_fast_des_dist_dict = pickle.load(scanned_files)
-        fpi_fast_dis_dist_dict = pickle.load(scanned_files)
         fpi_brst_des_moms_dict = pickle.load(scanned_files)
+        fpi_brst_dis_dist_dict = pickle.load(scanned_files)
         fpi_brst_dis_moms_dict = pickle.load(scanned_files)
+        fpi_fast_des_dist_dict = pickle.load(scanned_files)
         fpi_fast_des_moms_dict = pickle.load(scanned_files)
+        fpi_fast_dis_dist_dict = pickle.load(scanned_files)
         fpi_fast_dis_moms_dict = pickle.load(scanned_files)
         hpca_brst_ion_dict     = pickle.load(scanned_files)
         hpca_brst_moments_dict = pickle.load(scanned_files)
@@ -198,13 +225,18 @@ for obs in observatories:
     my_files['%s' % (obs,)]['dce_b']       = Scraper.limit_time_range(start_time_brst,stop_time_brst,dce_brst_dict)
     my_files['%s' % (obs,)]['scpot_f']     = Scraper.limit_time_range(start_time_fast,stop_time_fast,scpot_fast_dict)
     my_files['%s' % (obs,)]['fgm_b']       = Scraper.limit_time_range(start_time_brst,stop_time_brst,fgm_brst_dict)
-    my_files['%s' % (obs,)]['des_dist_b']  = Scraper.limit_time_range(start_time_brst,stop_time_brst,fpi_brst_des_dist_dict)
-    my_files['%s' % (obs,)]['dis_dist_b']  = Scraper.limit_time_range(start_time_brst,stop_time_brst,fpi_brst_dis_dist_dict)
-    my_files['%s' % (obs,)]['des_moms_b']  = Scraper.limit_time_range(start_time_brst,stop_time_brst,fpi_brst_des_moms_dict)
-    my_files['%s' % (obs,)]['dis_moms_b']  = Scraper.limit_time_range(start_time_brst,stop_time_brst,fpi_brst_dis_moms_dict)
+    my_files['%s' % (obs,)]['fgm_s']       = Scraper.limit_time_range(start_time_srvy,stop_time_srvy,fgm_srvy_dict)    
+    my_files['%s' % (obs,)]['edist_b']     = Scraper.limit_time_range(start_time_brst,stop_time_brst,fpi_brst_des_dist_dict)
+    my_files['%s' % (obs,)]['emoms_b']     = Scraper.limit_time_range(start_time_brst,stop_time_brst,fpi_brst_des_moms_dict)
+    my_files['%s' % (obs,)]['idist_b']     = Scraper.limit_time_range(start_time_brst,stop_time_brst,fpi_brst_dis_dist_dict)
+    my_files['%s' % (obs,)]['imoms_b']     = Scraper.limit_time_range(start_time_brst,stop_time_brst,fpi_brst_dis_moms_dict)
+    my_files['%s' % (obs,)]['edist_f']     = Scraper.limit_time_range(start_time_brst,stop_time_fast,fpi_brst_des_dist_dict)
+    my_files['%s' % (obs,)]['emoms_f']     = Scraper.limit_time_range(start_time_brst,stop_time_fast,fpi_brst_des_moms_dict)
+    my_files['%s' % (obs,)]['idist_f']     = Scraper.limit_time_range(start_time_brst,stop_time_fast,fpi_brst_dis_dist_dict)
+    my_files['%s' % (obs,)]['imoms_f']     = Scraper.limit_time_range(start_time_brst,stop_time_fast,fpi_brst_dis_moms_dict)
     my_files['%s' % (obs,)]['hpca_ion_b']  = Scraper.limit_time_range(start_time_brst,stop_time_brst,hpca_brst_ion_dict)
     my_files['%s' % (obs,)]['hpca_moms_b'] = Scraper.limit_time_range(start_time_brst,stop_time_brst,hpca_brst_moments_dict)
-    my_files['%s' % (obs,)]['mec_f']       = Scraper.limit_time_range(start_time_fast,stop_time_fast,mec_srvy_epht89d_dict)
+    my_files['%s' % (obs,)]['mec_s']       = Scraper.limit_time_range(start_time_srvy,stop_time_srvy,mec_srvy_epht89d_dict)
     
     
     if prj_dict['load_local'] == 'True':
