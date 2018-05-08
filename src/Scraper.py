@@ -399,7 +399,11 @@ def limit_time_range(start_time,stop_time,my_dict):
     """
     filtered_list = []
     for time in sorted(my_dict.keys()):
-        if time > start_time and time < stop_time:
+        if len(time) == 10:  #8 digit timestamp
+            compare_time = time+' 00:00:00'
+        else:
+            compare_time = time
+        if compare_time >= start_time and compare_time <= stop_time:
             #print time, my_dict[time]['filename']
             filtered_list.append(my_dict[time]['filename'])
 
