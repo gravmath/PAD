@@ -74,8 +74,8 @@ def make_density_panel(ax,obs,emoms_munge,imoms_munge):
         nij = imoms_munge[j]['num_den']
         n_trace.add_line(tej,nej)
         n_trace.add_line(tij,nij)
-        n_trace.customize_li(j+1,{'color':'black'})
-        n_trace.customize_li(j+2,{'color':'green'})
+        n_trace.customize_li(2*j,{'color':'black'})
+        n_trace.customize_li(2*j+1,{'color':'green'})
         
     n_trace.customize_ax({'ylabel':'%s\\ndensity\\n[$cm^{-3}$]'%obs})
     n_trace.show_legend()
@@ -100,9 +100,9 @@ def make_sdensity_panel(ax,obs,smoms_munge,species):
         nsj = emoms_munge[j]['num_den']
         n_trace.add_line(tsj,nsj)
         if species == 'emoms':
-            n_trace.customize_li(j+1,{'color':'black'})
+            n_trace.customize_li(2*j,{'color':'black'})
         if species == 'imoms':
-            n_trace.customize_li(j+2,{'color':'green'})
+            n_trace.customize_li(2*j+1,{'color':'green'})
     
     if species == 'emoms':
         n_trace.customize_ax({'ylabel':'%s\\n$N_e$\\n[$cm^{-3}$]'%obs})
@@ -150,10 +150,10 @@ def make_temperature_panel(ax,obs,emoms_munge,imoms_munge):
         T_trace.add_line(tej,Te_parj)
         T_trace.add_line(tij,Ti_perpj)
         T_trace.add_line(tij,Ti_parj)    
-        T_trace.customize_li(j+3,{'color':'red'})
-        T_trace.customize_li(j+4,{'color':'blue'})
-        T_trace.customize_li(j+5,{'color':'black'})
-        T_trace.customize_li(j+6,{'color':'green'})
+        T_trace.customize_li(4*j,{'color':'red'})
+        T_trace.customize_li(4*j+1,{'color':'blue'})
+        T_trace.customize_li(4*j+2,{'color':'black'})
+        T_trace.customize_li(4*j+3,{'color':'green'})
         
     T_trace.customize_ax({'ylabel':'%s\\nTemp\\n[eV]'%obs,'ylim':[1,1e4],'yscale':'log'})
     T_trace.show_legend()                          
@@ -185,11 +185,11 @@ def make_stemperature_panel(ax,obs,smoms_munge,species):
         T_trace.add_line(tsj,Ts_perpj)
         T_trace.add_line(tsj,Ts_parj)
         if species == 'emoms':
-            T_trace.customize_li(j+3,{'color':'red'})
-            T_trace.customize_li(j+4,{'color':'blue'})
+            T_trace.customize_li(4*j,{'color':'red'})
+            T_trace.customize_li(4*j+1,{'color':'blue'})
         if species == 'imoms':
-            T_trace.customize_li(j+3,{'color':'black'})
-            T_trace.customize_li(j+4,{'color':'green'})
+            T_trace.customize_li(4*j+2,{'color':'black'})
+            T_trace.customize_li(4*j+3,{'color':'green'})
             
     if species == 'emoms':
         T_trace.customize_ax({'ylabel':'%s\\n$T_e$\\n[eV]'%obs,'ylim':[1,1e4],'yscale':'log'})
@@ -227,12 +227,12 @@ def make_Vvector_panel(ax,obs,emoms_munge,imoms_munge):
     V_trace.add_line(ti1,Vyi1)
     V_trace.add_line(ti1,Vzi1)
     V_trace.add_line(ti1,Vyi1)
-    V_trace.customize_li(0,{'color':'red',  'label':'Vxe_gse','linestyle':'-'})
-    V_trace.customize_li(1,{'color':'blue', 'label':'Vye_gse','linestyle':'-'})
-    V_trace.customize_li(2,{'color':'green','label':'Vze_gse','linestyle':'-'})
-    V_trace.customize_li(3,{'color':'red',  'label':'Vxi_gse','linestyle':'--'})
-    V_trace.customize_li(4,{'color':'blue', 'label':'Vyi_gse','linestyle':'--'})
-    V_trace.customize_li(5,{'color':'green','label':'Vzi_gse','linestyle':'--'})
+    V_trace.customize_li(0,{'color':'blue',  'label':'Vxe_gse','linestyle':'-'})
+    V_trace.customize_li(1,{'color':'green', 'label':'Vye_gse','linestyle':'-'})
+    V_trace.customize_li(2,{'color':'red','label':'Vze_gse','linestyle':'-'})
+    V_trace.customize_li(3,{'color':'blue',  'label':'Vxi_gse','linestyle':'--'})
+    V_trace.customize_li(4,{'color':'green', 'label':'Vyi_gse','linestyle':'--'})
+    V_trace.customize_li(5,{'color':'red','label':'Vzi_gse','linestyle':'--'})
 
     for j in range(1,num_strides):
         tej      = emoms_munge[j]['epochs']
@@ -249,12 +249,12 @@ def make_Vvector_panel(ax,obs,emoms_munge,imoms_munge):
         V_trace.add_line(tij,Vyij)
         V_trace.add_line(tij,Vzij)
         V_trace.add_line(tij,Vyij)
-        V_trace.customize_li(j+5, {'color':'red',  'linestyle':'-'})
-        V_trace.customize_li(j+6, {'color':'blue', 'linestyle':'-'})
-        V_trace.customize_li(j+7, {'color':'green','linestyle':'-'})
-        V_trace.customize_li(j+8, {'color':'red',  'linestyle':'--'})
-        V_trace.customize_li(j+9, {'color':'blue', 'linestyle':'--'})
-        V_trace.customize_li(j+10,{'color':'green','linestyle':'--'})
+        V_trace.customize_li(6*j, {'color':'blue',  'linestyle':'-'})
+        V_trace.customize_li(6*j+1, {'color':'green', 'linestyle':'-'})
+        V_trace.customize_li(6*j+2, {'color':'red','linestyle':'-'})
+        V_trace.customize_li(6*j+3, {'color':'blue',  'linestyle':'--'})
+        V_trace.customize_li(6*j+4, {'color':'green', 'linestyle':'--'})
+        V_trace.customize_li(6*j+5,{'color':'red','linestyle':'--'})
     
     
     V_trace.customize_ax({'ylabel':'%s\\nVelocity\\n[km/s]'%obs,\
@@ -276,9 +276,9 @@ def make_sVvector_panel(ax,obs,smoms_munge,species):
     V_trace  = Grapher.curves(ax,ts1,Vxs1)
     V_trace.add_line(ts1,Vys1)
     V_trace.add_line(ts1,Vzs1)
-    V_trace.customize_li(0,{'color':'red',  'label':'$V_x (GSE)$','linestyle':'-'})
-    V_trace.customize_li(1,{'color':'blue', 'label':'$V_y (GSE)$','linestyle':'-'})
-    V_trace.customize_li(2,{'color':'green','label':'$V_z (GSE)$','linestyle':'-'})
+    V_trace.customize_li(0,{'color':'blue',  'label':'$V_x (GSE)$','linestyle':'-'})
+    V_trace.customize_li(1,{'color':'green', 'label':'$V_y (GSE)$','linestyle':'-'})
+    V_trace.customize_li(2,{'color':'red','label':'$V_z (GSE)$','linestyle':'-'})
 
     for j in range(1,num_strides):
         tsj      = smoms_munge[j]['epochs']
@@ -288,9 +288,9 @@ def make_sVvector_panel(ax,obs,smoms_munge,species):
         V_trace.add_line(tsj,Vxsj)
         V_trace.add_line(tsj,Vysj)
         V_trace.add_line(tsj,Vzsj)
-        V_trace.customize_li(j+2, {'color':'red',  'linestyle':'-'})
-        V_trace.customize_li(j+3, {'color':'blue', 'linestyle':'-'})
-        V_trace.customize_li(j+4, {'color':'green','linestyle':'-'})
+        V_trace.customize_li(3*j, {'color':'blue',  'linestyle':'-'})
+        V_trace.customize_li(3*j+1, {'color':'green', 'linestyle':'-'})
+        V_trace.customize_li(3*j+2, {'color':'red','linestyle':'-'})
   
     if species == 'emoms':
         V_trace.customize_ax({'ylabel':'%s\\n$V_e$\\n[km/s]'%(obs)})
@@ -300,20 +300,20 @@ def make_sVvector_panel(ax,obs,smoms_munge,species):
     return V_trace
     
 ###############################################################################    
-def make_Et_panel(fig,ax,obs,smoms_munge,species,sc_pot):
+def make_Et_panel(fig,ax,obs,smoms_munge,species,sc_pot,min_val,max_val):
     #determine the number of segments
     num_strides = len(smoms_munge)
 
     s1 = np.ma.masked_invalid(np.log10(smoms_munge[0]['omnis'])).T
     t1 = smoms_munge[0]['epochs']
     E1 = smoms_munge[0]['ergs'][0,:]
-    Et_spec = Grapher.patch(ax,t1,E1,s1,4,8)
+    Et_spec = Grapher.patch(ax,t1,E1,s1,min_val,max_val)
     
     for j in range(1,num_strides):
         sj = np.ma.masked_invalid(np.log10(smoms_munge[j]['omnis'])).T
         tj = smoms_munge[j]['epochs']
         Ej = smoms_munge[j]['ergs'][0,:]
-        ax.pcolormesh(tj,Ej,sj,vmin=4,vmax=8,cmap=cmap.jet)
+        ax.pcolormesh(tj,Ej,sj,vmin=min_val,vmax=max_val,cmap=cmap.jet)
     
     cmap.jet.set_bad('k',alpha=1.0) 
     Et_spec.set_colormap(cmap.jet)
@@ -351,9 +351,9 @@ def make_Bvector_panel(ax,obs,Bmunge):
         Bvector.add_line(ti,Bxi)
         Bvector.add_line(ti,Byi)
         Bvector.add_line(ti,Bzi)
-        Bvector.customize_li(i+2,{'color':'blue'})
-        Bvector.customize_li(i+3,{'color':'green'})
-        Bvector.customize_li(i+4,{'color':'red'})
+        Bvector.customize_li(3*i,{'color':'blue'})
+        Bvector.customize_li(3*i+1,{'color':'green'})
+        Bvector.customize_li(3*i+2,{'color':'red'})
 
     ylab = '%s\\nFGM\\n[nT]' % (obs,)
     Bvector.customize_ax({'ylabel':ylab})

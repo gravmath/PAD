@@ -88,14 +88,15 @@ def calculate_incoming_particle_directions(sdist_munge):
 
 ###############################################################################         
 def calculate_pitch_angles(fgm_munge,sdist_munge):
-    """Analysis function to compute the pitch angles of a distribution.
+    """Analysis function to calculate the pitch angles of a distribution.
 
        Arguments:
           fgm_munge:   a magnetic field munge
           sdist_munge: a munge of either electron or ion distribution
 
        Returns:
-           nothing per se - adds to the sdist_munge a field for pitch angles
+           nothing per se - adds to the sdist_munge a field 'pitch_angs' 
+           for pitch angles of the distribution
        
        Example use:  
            compute_pitch_angles(fgm_munge_mms1_brst,edist_munge_mms1_brst)
@@ -127,14 +128,30 @@ def calculate_pitch_angles(fgm_munge,sdist_munge):
 
 ###############################################################################         
 def calculate_differential_number_flux(sdist_munge,species):
+    """Analysis function to calculate the differential number flux of a 
+       distribution.
+
+       Arguments:
+          sdist_munge: a munge of either electron or ion distribution
+          species:     either 'electrons' or 'ions'
+
+       Returns:
+           nothing per se - adds to the sdist_munge a field 'jn' for 
+           differential number flux
+       
+       Example use:  
+           calculate_differential_number_flux(sdist_munge,species)
+              
+       Note:  None
+       """    
     #determine number of strides
     num_strides = len(sdist_munge)
     
     #set physical constants, including the mass of the species
     c = 29979245800 #cm/s
-    if species == 'emoms':
+    if species == 'electrons':
         ms = 0.5109989461e6/c**2 #ev/c^2
-    if species == 'imoms':
+    if species == 'ions':
         ms = 938.2720813e6/c**2 #ev/c^2
         
     #differential number flux: j_n = 1/2 f v^4/E
@@ -147,21 +164,68 @@ def calculate_differential_number_flux(sdist_munge,species):
             for k in range(num_polar):
                 for m in range(num_ergs):
                     jn[:,j,k,m] = 2.0*f[:,j,k,m]*Es[:,m]/ms**2
-                    print 2.0*Es[:,m]/ms**2
+                    #print 2.0*Es[:,m]/ms**2
         sdist_munge[N]['jn'] = jn    
         
+###############################################################################        
+def calculate_omni_number_flux(sdist_munge):
+    """Analysis function to calculate the omnidirectional number flux of a 
+       distribution.
+
+       Arguments:
+          sdist_munge: a munge of either electron or ion distribution
+
+       Returns:
+           nothing per se - adds to the sdist_munge a field 'omni_jn' for 
+           differential number flux
+       
+       Example use:  
+           calculate_omni_number_flux(sdist_munge)
+              
+       Note:  None
+       """    
+       
+    #determine the number of strides
+    num_strides = len(sdist_munge)
+    
+    for N in range(num_strides):
+        omni_jn = np.average(np.average(sdist_munge[N]['jn'][:,:,:,:],axis=1),axis=1)/(4.0*np.pi)
+        sdist_munge[N]['omni_jn'] = omni_jn
+
+###############################################################################
+#
+# compute_limited_PAD returns a truncated PAD limited by energy and pitch 
+# angle from the full data
+#
+###############################################################################
+def compute_limited_PAD(mode,time_label,minE,maxE,minPA,maxPA,core_data):
+    #find the truncated energy range
+    Edata                     = core_data['parms']['Erg'][minE:maxE]
+    
+    #get the pitch angles and then flatten to a 1-D array
+    pitch_angles              = compute_pitch_angles(mode,core_data['v_dirs'],core_data['bfield'],time_label)
+    flat_PA                   = np.ndarray.flatten(pitch_angles)
+    
+    sub_PAD                   = np.zeros(len(range(minE,maxE)))
+    counter                   = 0
+    for energy_label in range(minE,maxE):
+        local_jN              = np.ndarray.flatten(core_data['jN'][time_label,:,:,energy_label])
+        PA_table              = np.array(zip(flat_PA,local_jN))
+        PA_range              = np.where( (flat_PA > minPA) & (flat_PA < maxPA))
+        sub_PAD[counter]      = np.sum(PA_table[PA_range][:,1])
+        counter              += 1        
+    
+    sterads    = spherical_cap_area(maxPA) - spherical_cap_area(minPA)        
+    return Edata, sub_PAD/sterads
+
+
+############################################################################### 
+def spherical_cap_area(theta):
+    #put theta into radians
+    theta_loc = np.pi*theta/180.0
+    
+    #compute spherical cap area based on the formula in Wikipedia
+    A = 2*np.pi*(1-np.cos(theta_loc))
+    
+    return A        
         
-def compute_number_flux(sdist_munge):
-    m_e    = 9.10938356e-31  #mass of electron in Kg
-    eV     = 1.60218e-19     #energy of 1 electron-volt in Joules
-    N      = 0
-    E      = sdist_munge[N]['ergs'][0,:]
-    coeff  = 2.0*(E*eV/m_e)**2/E *100.0**4 #100**2 for m -> cm
-    jN     = np.zeros(sdist_munge[N]['dist'].shape)
-    counter = 0
-    for c in coeff:
-        jN[:,:,:,counter] = c * sdist_munge[N]['dist'][:,:,:,counter]
-        counter           = counter + 1
-        
-    #jN     = coeff*FS_dist['Dist'] - don't know why this ever worked
-    return jN          
