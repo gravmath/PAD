@@ -80,6 +80,42 @@ def make_density_panel(ax,obs,emoms_munge,imoms_munge):
     n_trace.customize_ax({'ylabel':'%s\\ndensity\\n[$cm^{-3}$]'%obs})
     n_trace.show_legend()
     return n_trace
+    
+###############################################################################
+def make_beta_panel(ax,obs,emoms_munge,imoms_munge):
+    #determine the number of segments 
+    num_estrides = len(emoms_munge)
+    num_istrides = len(imoms_munge)
+    if num_estrides != num_istrides:
+        print "Burst segments for electrons and ions don't match!"
+        print "Terminating with extreme prejudice!!!"
+        return False
+    else:
+        num_strides = num_estrides
+       
+    #graph and label the first segment
+    te1 = emoms_munge[0]['epochs']
+    be1 = emoms_munge[0]['beta']
+    ti1 = imoms_munge[0]['epochs']
+    bi1 = imoms_munge[0]['beta']
+    b_trace = Grapher.curves(ax,te1,be1)
+    b_trace.add_line(ti1,bi1)
+    b_trace.customize_li(0,{'color':'black','label':'Beta_e'})
+    b_trace.customize_li(1,{'color':'green','label':'Beta_i'})
+    
+    for j in range(1,num_strides):
+        tej = emoms_munge[j]['epochs']
+        bej = emoms_munge[j]['beta']
+        tij = imoms_munge[j]['epochs']
+        bij = imoms_munge[j]['beta']
+        b_trace.add_line(tej,bej)
+        b_trace.add_line(tij,bij)
+        b_trace.customize_li(2*j,{'color':'black'})
+        b_trace.customize_li(2*j+1,{'color':'green'})
+        
+    b_trace.customize_ax({'ylabel':'%s\\nBeta'%obs,'yscale':'log'})
+    b_trace.show_legend()
+    return b_trace    
 
 ###############################################################################
 def make_sdensity_panel(ax,obs,smoms_munge,species):
