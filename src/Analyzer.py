@@ -96,15 +96,13 @@ def make_record_varying(munge,key):
         munge[N][key] = np.tile(temp,(num_tknots,1))        
         
 ###############################################################################         
-def calculate_index(vals,min_val,max_val,num_points):
+def calculate_index(data,data_bin):
     """Analysis function to calculate the indices that map a 1D array of values
        to a specfic bin.
 
        Arguments:
-          vals:       1D array of raw values to be mapped to a bin
-          min_val:    minimum considered value in the bin
-          max_val:    maximum considered value in the bin
-          num_points: number of points in the bin
+          data:       1D array of raw values to be mapped to a bin
+          data_bin:   1D array with the bins
 
        Returns:
            index:     1D array of indices stating were the data belongs in 
@@ -113,25 +111,24 @@ def calculate_index(vals,min_val,max_val,num_points):
                       in the bin (1) or falls outside (0)
        
        Example use:  
-           index, flag = calculate_index(vals,min_val,max_val,num_points)
+           index, flag = calculate_index(vals,my_bin)
               
        Note:  Assumes a 1D array
        """    
-    #determine the delta
-    delta  = (max_val - min_val)/(num_points - 1)
-    offset = (num_points - 1)/2
+    delta   = data_bin[1] - data_bin[0]
+    num_pts = len(data_bin) 
     
-    index = np.around(vals/delta).astype(int) + offset
-    flag  = np.ones(len(vals))
+    index = np.around((data-data_bin[0])/delta).astype(int)
+    flag  = np.ones(len(data))
     
     subzero_indices          = np.where(index < 0)
-    over_9000_indices        = np.where(index > num_points - 1)
+    over_9000_indices        = np.where(index > num_pts - 1)
     index[subzero_indices]   = 0
     flag[subzero_indices]    = 0.0
-    index[over_9000_indices] = num_points - 1
+    index[over_9000_indices] = num_pts - 1
     flag[over_9000_indices]  = 0.0
-        
-    return index, flag        
+    
+    return index, flag  
 
 ############################################################################### 
 def calculate_incoming_particle_directions(sdist_munge):
