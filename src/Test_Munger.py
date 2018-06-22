@@ -1,46 +1,37 @@
-#study data
-obs     = 'mms1'
-year    = '2017'
-month   = '06'
-day     = '08'
-basedir = '/fpiprd1/fpishare/Conrad/Yuggoth/'
-#basedir = 'c:/Yuggoth/'
-
-import sys
+import cPickle as pickle
 import numpy as np
-import scipy as sp
-import matplotlib.pyplot as plt
-sys.path.append('c:/Users/Conrad/Documents/GitHub/PAD/src/')
-sys.path.append('/home/cschiff/PAD/src/')
-import Burst_Munger as munge
+import scipy.interpolate as interp
+import sys
+
+import Analyzer
 import Grapher
+import Munger
 import PAD
+import Plasma_Plotter
+import Scraper
 
-epoch_strings = ['20170608133933',
-                 '20170608134133',
-                 '20170608134403',
-                 '20170608134623',
-                 '20170608134853',
-                 '20170608135003',
-                 '20170608135133',
-                 '20170608135353',
-                 '20170608135623',
-                 '20170608135803',
-                 '20170608135943',
-                 '20170608140143',
-                 '20170608140353',
-                 '20170608140603',
-                 '20170608140813',
-                 '20170608141033',
-                 '20170608141243',
-                 '20170608141453',
-                 '20170608141703',
-                 '20170608141923',
-                 '20170608142133',
-                 '20170608142303',
-                 '20170608143333',
-                 '20170608143453']
+obs = 'mms1'
+obs_files = pickle.load(open('c:/Users/cschiff/Documents/github/Plasma_Projects/Jim_Burch_Science_Unit_Test/Jim_Burch_Science_Unit_Test.data_local','r')) 
+m1f = obs_files[obs]
 
-munge.config_directories(basedir,obs,year,month,day)
+dce_munge   = Munger.make_munge_via_translation(obs,'dce',Munger.dce_delta,m1f['dce_b'],Munger.dce_translation)
+print 
+fgm_munge   = Munger.make_munge_via_translation(obs,'fgm',Munger.fgm_delta,m1f['fgm_b'],Munger.fgm_translation) 
+print 
+emoms_munge = Munger.make_munge_via_translation(obs,'emoms',Munger.des_delta,m1f['emoms_b'],Munger.emoms_translation)
+print 
+imoms_munge = Munger.make_munge_via_translation(obs,'imoms',Munger.dis_delta,m1f['imoms_b'],Munger.imoms_translation)
+print 
+edist_munge = Munger.make_munge_via_translation(obs,'edist',Munger.des_delta,m1f['edist_b'],Munger.edist_translation)
+print 
+idist_munge = Munger.make_munge_via_translation(obs,'idist',Munger.dis_delta,m1f['idist_b'],Munger.idist_translation)
+print 
+bpsd_munge  = Munger.make_munge_via_translation(obs,'bpsd',0,m1f['bpsd_f'],Munger.bpsd_translation)
+print 
+epsd_munge  = Munger.make_munge_via_translation(obs,'epsd',0,m1f['epsd_f'],Munger.epsd_translation)
+print 
+mec_munge   = Munger.make_munge_via_translation(obs,'mec',0,m1f['mec_s'],Munger.mec_translation)
+print 
+scpot_munge = Munger.make_munge_via_translation(obs,'scpot',0,m1f['scpot_f'],Munger.scpot_translation)
 
-Be   = munge.munge_moms(epoch_strings,'des')
+efgm_munge   = Munger.adapt_munge_to_munge(fgm_munge,emoms_munge)

@@ -14,6 +14,15 @@ num_pixels     = num_az*num_polar
 num_channels   = num_az*num_polar*num_ergs
 deg            = sp.pi/180.0
 
+
+#set physical constants, including the mass of the species
+c    = 299792458.000       #m/s
+mu_0 = 4*np.pi*1.0e-7      #N/A^2
+ep_0 = 5.52634940620899e7  #eV/(V^2 m)
+m_e  = 0.5109989461e6/c**2 #ev/c^2
+m_p  = 938.2720813e6/c**2  #ev/c^2
+c_e  = 1.6021766208E-19    #electronic charge in Coulombs 
+
 ############################################################################### 
 def calculate_mec_to_tknot(tknot,mec_munge,frame):
     """Helper function to interpolate MEC data to a given tknot.
@@ -81,7 +90,8 @@ def make_record_varying(munge,key):
         #determine the number of tknots
         num_tknots = len(munge[N]['epochs'])
         
-        #determine the number of NRV values
+        #determine the number of NRV values (multiple copies made on 
+        #ingestion from the CDF associated with a segment)
         num_NRV_vals = len(munge[N][key])/num_segs
         
         #copy the NRV data
@@ -187,12 +197,10 @@ def calculate_incoming_particle_velocities(sdist_munge,species):
     #determine the number of strides
     num_stride = len(sdist_munge)
 
-    #set physical constants, including the mass of the species
-    c    = 299792.458000 #km/s
     if species == 'electrons':
-        ms = 0.5109989461e6/c**2 #ev/c^2
+        ms = m_e
     if species == 'ions':
-        ms = 938.2720813e6/c**2 #ev/c^2
+        ms = m_p
 
     for N in range(num_stride):
         #determine the number of tknots
@@ -207,7 +215,7 @@ def calculate_incoming_particle_velocities(sdist_munge,species):
         ergs       = ergs.reshape(num_tknots,num_channels)
         
         #compute the speeds and velocities
-        speeds      = np.sqrt(2.0*ergs/ms)
+        speeds      = np.sqrt(2.0*ergs/ms)/1000.0  #division by 1000.0 for km/s
         vels        = np.zeros((num_tknots,num_channels,num_components))
         vels[:,:,0] = speeds*v_dirs[:,:,0]
         vels[:,:,1] = speeds*v_dirs[:,:,1]
@@ -252,11 +260,11 @@ def calculate_B_local_transformation(sfgm_munge,smoms_munge):
         sfgm_munge[N]['T_localB'] = T        
 
 ###############################################################################         
-def calculate_pitch_angles(fgm_munge,sdist_munge):
+def calculate_pitch_angles(sfgm_munge,sdist_munge):
     """Analysis function to calculate the pitch angles of a distribution.
 
        Arguments:
-          fgm_munge:   a magnetic field munge
+          sfgm_munge:  a magnetic field munge adapted to the sdist
           sdist_munge: a munge of either electron or ion distribution
 
        Returns:
@@ -269,16 +277,16 @@ def calculate_pitch_angles(fgm_munge,sdist_munge):
        Note:  None
        """    
     #determine the number of strides
-    num_fgm_strides   = len(fgm_munge)
+    num_sfgm_strides   = len(sfgm_munge)
     num_sdist_strides = len(sdist_munge)
-    if num_fgm_strides != num_sdist_strides:
-        print 'Direct comparison of fgm_munge to sdist_munge not possible.'
+    if num_sfgm_strides != num_sdist_strides:
+        print 'Direct comparison of sfgm_munge to sdist_munge not possible.'
         print 'Terminating with extreme prejudice!!!'
         return False
-    num_strides = num_fgm_strides
+    num_strides = num_sfgm_strides
     
     #adapt the fgm_munge to the sdist_munge
-    sfgm_munge = Munger.adapt_munge_to_munge(fgm_munge,sdist_munge)
+    #sfgm_munge = Munger.adapt_munge_to_munge(fgm_munge,sdist_munge)
     
     for N in range(num_strides):
         num_tknots = len(sdist_munge[N]['epochs'])
@@ -291,6 +299,45 @@ def calculate_pitch_angles(fgm_munge,sdist_munge):
         dot_prods[mask,:,:] = np.nan
         sdist_munge[N]['pitch_angs'] = np.arccos(dot_prods)*180.0/np.pi
 
+###############################################################################         
+def calculate_differential_number_flux(sdist_munge,species):
+    """Analysis function to calculate the differential number flux of a 
+       distribution.
+
+       Arguments:
+          sdist_munge: a munge of either electron or ion distribution
+          species:     either 'electrons' or 'ions'
+
+       Returns:
+           nothing per se - adds to the sdist_munge a field 'jn' for 
+           differential number flux
+       
+       Example use:  
+           calculate_differential_number_flux(sdist_munge,species)
+              
+       Note:  None
+       """    
+    #determine number of strides
+    num_strides = len(sdist_munge)
+    
+    if species == 'electrons':
+        ms = m_e
+    if species == 'ions':
+        ms = m_p
+        
+    #differential number flux: j_n = 1/2 f v^4/E
+    #v^2 = 2 E / m -> j_n = 2(E/m)^2/E = 2E/m^2
+    for N in range(num_strides):
+        jn = np.zeros(sdist_munge[N]['dist'].shape)
+        f  = sdist_munge[N]['dist']
+        Es = sdist_munge[N]['ergs']
+        for j in range(num_az):
+            for k in range(num_polar):
+                for m in range(num_ergs):
+                    jn[:,j,k,m] = 2.0*f[:,j,k,m]*Es[:,m]/ms**2*(100.0)**4 #(100.0)^4 for cm
+                    #print 2.0*Es[:,m]/ms**2
+        sdist_munge[N]['jn'] = jn         
+        
 ###############################################################################            
 def calculate_energy_PAD_at_time_and_energy(sdist_munge,timelabel,erg_index,num_angs):
     """Analysis function to calculate the pitch angle distribution
@@ -323,48 +370,7 @@ def calculate_energy_PAD_at_time_and_energy(sdist_munge,timelabel,erg_index,num_
         valid_pts  = np.logical_and(sliced_pa>=angs[N-1],sliced_pa<angs[N])
         PAD[N-1]   = np.average(sliced_jn[valid_pts])
     return ang_bins, PAD
-        
-        
-###############################################################################         
-def calculate_differential_number_flux(sdist_munge,species):
-    """Analysis function to calculate the differential number flux of a 
-       distribution.
-
-       Arguments:
-          sdist_munge: a munge of either electron or ion distribution
-          species:     either 'electrons' or 'ions'
-
-       Returns:
-           nothing per se - adds to the sdist_munge a field 'jn' for 
-           differential number flux
-       
-       Example use:  
-           calculate_differential_number_flux(sdist_munge,species)
-              
-       Note:  None
-       """    
-    #determine number of strides
-    num_strides = len(sdist_munge)
-    
-    #set physical constants, including the mass of the species
-    c = 29979245800 #cm/s
-    if species == 'electrons':
-        ms = 0.5109989461e6/c**2 #ev/c^2
-    if species == 'ions':
-        ms = 938.2720813e6/c**2 #ev/c^2
-        
-    #differential number flux: j_n = 1/2 f v^4/E
-    #v^2 = 2 E / m -> j_n = 2(E/m)^2/E = 2E/m^2
-    for N in range(num_strides):
-        jn = np.zeros(sdist_munge[N]['dist'].shape)
-        f  = sdist_munge[N]['dist']
-        Es = sdist_munge[N]['ergs']
-        for j in range(num_az):
-            for k in range(num_polar):
-                for m in range(num_ergs):
-                    jn[:,j,k,m] = 2.0*f[:,j,k,m]*Es[:,m]/ms**2
-                    #print 2.0*Es[:,m]/ms**2
-        sdist_munge[N]['jn'] = jn    
+           
         
 ###############################################################################        
 def calculate_omni_number_flux(sdist_munge):
@@ -418,17 +424,17 @@ def calculate_scalar_pressure(smoms_munge):
         smoms_munge[N]['scalar_p'] = scalar_p
 
 ###############################################################################          
-def calculate_plasma_beta(fgm_munge,smoms_munge):
+def calculate_plasma_beta(sfgm_munge,smoms_munge):
     """Analysis function to calculate the plasma beta for a particle moments
        munge.
 
        Arguments:
-          fgm_munge:   a munge for fgm (unadapted)
+          sfgm_munge:  a munge for fgm (adapted)
           smoms_munge: a munge of either electron or ion moments
 
        Returns:
-           nothing per se - adds to the sdist_munge a field 'beta' for 
-           differential number flux
+           nothing per se - adds to the smoms_munge a field 'beta' for 
+           plasma beta
        
        Example use:  
            calculate_plasma_beta(fgm_munge,emoms_munge)
@@ -439,18 +445,225 @@ def calculate_plasma_beta(fgm_munge,smoms_munge):
     num_strides = len(smoms_munge)
     
     #make a compatible fgm_munge
-    sfgm_munge = Munger.adapt_munge_to_munge(fgm_munge,smoms_munge)
-    
-    #enter some physical constants
-    mu_0 = 4*np.pi*1.0e-7
+    #sfgm_munge = Munger.adapt_munge_to_munge(fgm_munge,smoms_munge)
     
     #calculate plasma beta
+    #note that the factors of 1.0e-9 are needed to get nT -> T and nPa -> Pa
     for N in range(num_strides):
-        p_mag = (sfgm_munge[N]['Bbcs'][:,3]*1.0e-9)**2/(2*mu_0)
-        beta  = smoms_munge[N]['scalar_p']*1.0e-9/p_mag
+        mag_pres = (sfgm_munge[N]['Bbcs'][:,3]*1.0e-9)**2/(2*mu_0)
+        beta     = smoms_munge[N]['scalar_p']*1.0e-9/mag_pres
         
         smoms_munge[N]['beta'] = beta      
+        
+###############################################################################          
+def calculate_plasma_frequency(smoms_munge,species):
+    """Analysis function to calculate the plasma frequency for a particle moments
+       munge.
 
+       Arguments:
+          smoms_munge: a munge of either electron or ion moments
+          species:     either 'electrons' or 'ions'
+
+       Returns:
+           nothing per se - adds to the smoms_munge a field 'f_ps' for 
+           plasma frequency
+       
+       Example use:  
+           calculate_plasma_frequency(emoms_munge,'electrons')
+              
+       Note:  None
+       """ 
+       
+    #determine the number of strides
+    num_strides = len(smoms_munge)
+    
+    if species == 'electrons':
+        ms = m_e
+    if species == 'ions':
+        ms = m_p
+    
+    #calculate plasma frequency
+    for N in range(num_strides):
+        #multiplication of 100.0**3 to get num_den in units of per m^3
+        f_ps = np.sqrt( smoms_munge[N]['num_den']*100.0**3/ep_0/ms )/2.0/np.pi
+       
+        smoms_munge[N]['f_ps'] = f_ps
+        
+###############################################################################          
+def calculate_debye_length(smoms_munge):
+    """Analysis function to calculate the Debye length for a particle moments
+       munge.
+
+       Arguments:
+          smoms_munge: a munge of either electron or ion moments
+
+       Returns:
+           nothing per se - adds to the smoms_munge a field 'lambda_D_par' for 
+           Debye for T_par, 'lambda_D_perp' for T_perp
+       
+       Example use:  
+           calculate_debye_length(emoms_munge)
+              
+       Note:  None
+       """ 
+       
+    #determine the number of strides
+    num_strides = len(smoms_munge)
+    
+    #calculate debye length
+    for N in range(num_strides):
+        #multiplication of 100.0**3 to get num_den in units of per m^3
+        lambda_D_par  = np.sqrt( ep_0 * smoms_munge[N]['T_par']  / smoms_munge[N]['num_den']/100.0**3 )
+        lambda_D_perp = np.sqrt( ep_0 * smoms_munge[N]['T_perp'] / smoms_munge[N]['num_den']/100.0**3 )
+       
+        smoms_munge[N]['lambda_D_par']  = lambda_D_par
+        smoms_munge[N]['lambda_D_perp'] = lambda_D_perp
+        
+
+###############################################################################          
+def calculate_cyclotron_frequency(sfgm_munge,smoms_munge,species):
+    """Analysis function to calculate the cyclotron frequency for a particle moments
+       munge.
+
+       Arguments:
+          fgm_munge:   a munge of the magnetic field
+          smoms_munge: a munge of either electron or ion moments
+
+       Returns:
+           nothing per se - adds to the smoms_munge a field 'f_cs' for 
+           cyclotron frequency
+       
+       Example use:  
+           calculate_cyclotron_frequency(fgm_munge,emoms_munge)
+              
+       Note:  None
+       """ 
+       
+    #determine the number of strides
+    num_strides = len(smoms_munge)
+    
+    if species == 'electrons':
+        ms = m_e
+    if species == 'ions':
+        ms = m_p
+
+    #adapt the fgm_munge to the sdist_munge
+    #sfgm_munge = Munger.adapt_munge_to_munge(fgm_munge,smoms_munge)
+        
+    #calculate plasma frequency
+    for N in range(num_strides):
+        f_cs = sfgm_munge[N]['Bgse'][:,3]*1e-9/ms/2.0/np.pi
+        
+        smoms_munge[N]['f_cs'] = f_cs
+        
+###############################################################################          
+def calculate_current(emoms_munge,imoms_munge,species):
+    """Analysis function to calculate the current from particle
+       measurements
+
+       Arguments:
+          emoms_munge: a munge of the electron moments
+          imoms_munge: a munge of the ion moments
+          species:     string from 'electron' or 'ion'
+
+       Returns:
+           nothing per se - adds the current to the smoms_munge as determined
+           by the species string
+       
+       Example use:  
+           calculate_current(emoms_munge,imoms_munge,'electrons')
+              
+       Note:  None
+       """ 
+       
+   
+    if species == 'electrons':
+        #determine the number of strides
+        num_strides = len(emoms_munge)
+        amoms_munge = Munger.adapt_munge_to_munge(imoms_munge,emoms_munge)
+    if species == 'ions':
+        #determine the number of strides
+        num_strides = len(imoms_munge)
+        amoms_munge = Munger.adapt_munge_to_munge(emoms_munge,imoms_munge)
+
+    #calculate current
+    for N in range(num_strides):
+        J = np.zeros(amoms_munge[N]['bulk_vs'].shape)
+        if species == 'electrons':
+             J[:,0] = amoms_munge[N]['num_den'][:]*(amoms_munge[N]['bulk_vs'][:,0] - emoms_munge[N]['bulk_vs'][:,0])
+             J[:,1] = amoms_munge[N]['num_den'][:]*(amoms_munge[N]['bulk_vs'][:,1] - emoms_munge[N]['bulk_vs'][:,1])
+             J[:,2] = amoms_munge[N]['num_den'][:]*(amoms_munge[N]['bulk_vs'][:,2] - emoms_munge[N]['bulk_vs'][:,2])
+             emoms_munge[N]['current'] = c_e*J*1e15 #1e15 - to go from cm^-3 and km/s to microamps / m^2
+        if species == 'ions':
+             J[:,0] = imoms_munge[N]['num_den'][:]*(imoms_munge[N]['bulk_vs'][:,0] - amoms_munge[N]['bulk_vs'][:,0])
+             J[:,1] = imoms_munge[N]['num_den'][:]*(imoms_munge[N]['bulk_vs'][:,1] - amoms_munge[N]['bulk_vs'][:,1])
+             J[:,2] = imoms_munge[N]['num_den'][:]*(imoms_munge[N]['bulk_vs'][:,2] - amoms_munge[N]['bulk_vs'][:,2])
+             imoms_munge[N]['current'] = c_e*J*1e15 #1e15 - to go from cm^-3 and km/s to microamps / m^2
+             
+###############################################################################    
+def subtract_internal_photoelectrons(sdist_munge,mode,n_photo,photo_f_file):
+    """Analysis function to subtract the instrument internal photoelectrons
+       from a electron distribution
+
+       Arguments:
+          sdist_munge:   a munge of the electron distributions
+          mode:          either 'fast' or 'brst'
+          n_photo:       value of n_photo from the moms file
+          photo_f_file:  instrument photoelectron model file
+
+       Returns:
+           nothing per se - adds a corrected distribution to the sdist_munge
+       
+       Example use:  
+           subtract_internal_photoelectrons(edist_munge,'fast',0.45,photo_f_file)
+              
+       Note:  None
+    
+    
+    """
+    #determine the number of strides
+    num_strides = len(sdist_munge)
+    
+    #import the photoelectron phase space density
+    photo_f_cdf = pycdf.CDF(photo_f_file)
+    if mode == 'fast':
+        photo_mode_str = 'mms_des_bgdist_fast'
+        f_photo        = np.asarray(photo_f_cdf[photo_mode_str][:])
+    if mode == 'brst':
+        photo_mode_str0 = 'mms_des_bgdist_p0_brst'
+        photo_mode_str1 = 'mms_des_bgdist_p1_brst'
+        f_photo         = {}
+        f_photo[0]      = np.asarray(photo_f_cdf[photo_mode_str0][:])
+        f_photo[1]      = np.asarray(photo_f_cdf[photo_mode_str1][:])    
+      
+    for N in range(num_strides):
+        #allocate space for the corrected phase-space density data structure
+        corrected_dist = np.zeros(sdist_munge[N]['dist'].shape)
+    
+        #construct startdelphi_count_str
+        start_delphi_count_str = 'mms_des_startdelphi_counts_%s' % (mode,)
+                
+        #loop over all times
+        for k in range(len(sdist_munge[N]['epochs'])):
+            
+            #find start_delphi_index
+            startdelphi_index       = sdist_munge[N]['start_dphi'][k]
+            
+            #construct correction_index    
+            correction_index        = int(np.floor(startdelphi_index/16.0))
+            
+            #subtract off the correction
+            if mode == 'fast':
+                corrected_dist[k,:,:,:] = sdist_munge[N]['dist'][k,:,:,:] - n_photo*f_photo[correction_index,:,:,:]
+            if mode == 'brst':
+                parity = sdist_munge[N]['parity'][k]
+                corrected_dist[k,:,:,:] = sdist_munge[N]['dist'][k,:,:,:] - n_photo*f_photo[parity][correction_index,:,:,:]
+        
+        #floor the negative values at zero
+        corrected_dist[corrected_dist < 0.0 ] = 0.0
+        sdist_munge[N]['cdist'] = corrected_dist                
+        
+        
 ###############################################################################
 #
 # compute_limited_PAD returns a truncated PAD limited by energy and pitch 
@@ -481,10 +694,10 @@ def compute_limited_PAD(mode,time_label,minE,maxE,minPA,maxPA,core_data):
 ############################################################################### 
 def spherical_cap_area(theta):
     #put theta into radians
-    theta_loc = np.pi*theta/180.0
+    theta_rad = np.pi*theta/180.0
     
     #compute spherical cap area based on the formula in Wikipedia
-    A = 2*np.pi*(1-np.cos(theta_loc))
+    A = 2*np.pi*(1-np.cos(theta_rad))
     
     return A        
         

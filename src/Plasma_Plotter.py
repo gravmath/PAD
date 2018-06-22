@@ -335,8 +335,44 @@ def make_sVvector_panel(ax,obs,smoms_munge,species):
     V_trace.show_legend()
     return V_trace
     
+###############################################################################
+def make_Jvector_panel(ax,obs,smoms_munge):
+    #determine the number of segments
+    num_strides = len(smoms_munge)
+       
+    #graph and label the first segment
+    t1      = smoms_munge[0]['epochs']
+    Jx1     = smoms_munge[0]['current'][:,0]
+    Jy1     = smoms_munge[0]['current'][:,1]
+    Jz1     = smoms_munge[0]['current'][:,2]    
+    J_trace = Grapher.curves(ax,t1,Jx1)
+    J_trace.add_line(t1,Jy1)
+    J_trace.add_line(t1,Jz1)
+    J_trace.customize_li(0,{'color':'blue',  'label':'$J_x (GSE)$','linestyle':'-'})
+    J_trace.customize_li(1,{'color':'green', 'label':'$J_y (GSE)$','linestyle':'-'})
+    J_trace.customize_li(2,{'color':'red',   'label':'$J_z (GSE)$','linestyle':'-'})
+
+    for j in range(1,num_strides):
+        tj      = smoms_munge[j]['epochs']
+        Jxj     = smoms_munge[j]['current'][:,0]
+        Jyj     = smoms_munge[j]['current'][:,1]
+        Jzj     = smoms_munge[j]['current'][:,2]    
+        J_trace.add_line(tj,Jxj)
+        J_trace.add_line(tj,Jyj)
+        J_trace.add_line(tj,Jzj)
+        J_trace.customize_li(3*j,   {'color':'blue',  'linestyle':'-'})
+        J_trace.customize_li(3*j+1, {'color':'green', 'linestyle':'-'})
+        J_trace.customize_li(3*j+2, {'color':'red','linestyle':'-'})
+
+    
+    
+    J_trace.customize_ax({'ylabel':'%s\\nCurrent\\n[$\mu A$/$m^2$]'%obs,\
+                                        'ylim':[-10,10]})    
+    J_trace.show_legend()
+    return J_trace    
+    
 ###############################################################################    
-def make_Et_panel(fig,ax,obs,smoms_munge,species,sc_pot,min_val,max_val):
+def make_Et_panel(fig,ax,obs,smoms_munge,species,scpot,min_val,max_val):
     #determine the number of segments
     num_strides = len(smoms_munge)
 
@@ -344,22 +380,81 @@ def make_Et_panel(fig,ax,obs,smoms_munge,species,sc_pot,min_val,max_val):
     t1 = smoms_munge[0]['epochs']
     E1 = smoms_munge[0]['ergs'][0,:]
     Et_spec = Grapher.patch(ax,t1,E1,s1,min_val,max_val)
-    
+
     for j in range(1,num_strides):
         sj = np.ma.masked_invalid(np.log10(smoms_munge[j]['omnis'])).T
         tj = smoms_munge[j]['epochs']
         Ej = smoms_munge[j]['ergs'][0,:]
         ax.pcolormesh(tj,Ej,sj,vmin=min_val,vmax=max_val,cmap=cmap.jet)
-    
+
+    if scpot != 0:
+        tpot1 = scpot[0]['epochs']
+        vpot1 = scpot[0]['scpot']
+        ax.plot(tpot1,vpot1,'k-',linewidth = 3)
+        
     cmap.jet.set_bad('k',alpha=1.0) 
     Et_spec.set_colormap(cmap.jet)
     Et_spec.add_colorbar(fig)
     ax.set_yscale('log')
-    #ax.plot(t,sc_pot,'w-',linewidth = 3)
+    
     ax.set_ylabel('%s\n%s\nEnergy\n[eV]'%(obs,species))
     Et_spec.cbar.set_label('$keV/(cm^2 s sr keV)$')
 
     return Et_spec
+
+###############################################################################    
+def make_counterstream_panel(fig,ax,obs,smoms_munge,species,min_val,max_val):
+    #determine the number of segments
+    num_strides = len(smoms_munge)
+
+    c1 = np.ma.masked_invalid(smoms_munge[0]['par']/smoms_munge[0]['anti']).T
+    t1 = smoms_munge[0]['epochs']
+    E1 = smoms_munge[0]['ergs'][0,:]
+    Et_c_spec = Grapher.patch(ax,t1,E1,c1,min_val,max_val)
+    
+    for j in range(1,num_strides):
+        cj = np.ma.masked_invalid(smoms_munge[j]['par']/smoms_munge[j]['anti']).T
+        tj = smoms_munge[j]['epochs']
+        Ej = smoms_munge[j]['ergs'][0,:]
+        ax.pcolormesh(tj,Ej,cj,vmin=min_val,vmax=max_val,cmap=cmap.bwr)
+    
+    cmap.bwr.set_bad('k',alpha=1.0) 
+    cax  = fig.add_axes(Grapher.cbar_position(ax,0.01,0.01))
+    cbar = fig.colorbar(Et_c_spec.patch,cax=cax)  
+    Et_c_spec.set_colormap(cmap.bwr)
+    ax.set_yscale('log')
+    ax.set_ylabel('%s\n%s\nEnergy\n[eV]'%(obs,species))
+    cbar.set_label('Counter-streaming\nFraction')
+
+    return Et_c_spec
+    
+###############################################################################    
+def make_trap_fraction_panel(fig,ax,obs,smoms_munge,species,min_val,max_val):
+    #determine the number of segments
+    num_strides = len(smoms_munge)
+
+    f1 = np.ma.masked_invalid(2.0*smoms_munge[0]['perp']/(smoms_munge[0]['anti'] + smoms_munge[0]['par'])).T
+    t1 = smoms_munge[0]['epochs']
+    E1 = smoms_munge[0]['ergs'][0,:]
+    Et_f_spec = Grapher.patch(ax,t1,E1,f1,min_val,max_val)
+    
+    for j in range(1,num_strides):
+        fj = np.ma.masked_invalid(2.0*smoms_munge[j]['perp']/(smoms_munge[j]['anti'] + smoms_munge[j]['par'])).T
+        tj = smoms_munge[j]['epochs']
+        Ej = smoms_munge[j]['ergs'][0,:]
+        ax.pcolormesh(tj,Ej,fj,vmin=min_val,vmax=max_val,cmap=cmap.bwr)
+    
+    cmap.bwr.set_bad('k',alpha=1.0) 
+    cax  = fig.add_axes(Grapher.cbar_position(ax,0.01,0.01))
+    cbar = fig.colorbar(Et_f_spec.patch,cax=cax)  
+    Et_f_spec.set_colormap(cmap.bwr)
+    ax.set_yscale('log')
+    ax.set_ylabel('%s\n%s\nEnergy\n[eV]'%(obs,species))
+    cbar.set_label('Trapped\nFraction')
+
+    return Et_f_spec   
+
+
     
 ###############################################################################
 def make_Bvector_panel(ax,obs,Bmunge):
@@ -397,7 +492,7 @@ def make_Bvector_panel(ax,obs,Bmunge):
     return Bvector
     
 ###############################################################################    
-def make_psd_panel(fig,ax,obs,psd_munge,field):
+def make_psd_panel(fig,ax,obs,psd_munge,field,smoms_munge,type):
     #determine the number of segments
     num_strides = len(psd_munge)
 
@@ -407,12 +502,51 @@ def make_psd_panel(fig,ax,obs,psd_munge,field):
     t1 = psd_munge[0]['epochs']
     f1 = psd_munge[0]['freqs']
     psdt_spec = Grapher.patch(ax,t1,f1,s1,value_min,value_max)
-    
+    if type == 'plasma':
+        fs1 = smoms_munge[0]['f_ps']
+        ts1 = smoms_munge[0]['epochs']
+        ax.plot(ts1,fs1,'w-')
+    if type == 'cyclotron':
+        fs1 = smoms_munge[0]['f_cs']
+        ts1 = smoms_munge[0]['epochs']
+        ax.plot(ts1,fs1,'w-')
+    if type == 'half_cyclotron':
+        fs1 = smoms_munge[0]['f_cs']
+        ts1 = smoms_munge[0]['epochs']
+        ax.plot(ts1,fs1,'w-')
+        ax.plot(ts1,0.5*fs1,'w-')
+    if type == 'chorus':
+        fs1 = smoms_munge[0]['f_cs']
+        ts1 = smoms_munge[0]['epochs']
+        ax.plot(ts1,fs1,'w-')
+        ax.plot(ts1,0.5*fs1,'w-')
+        ax.plot(ts1,0.1*fs1,'w-')
+
+        
     for j in range(1,num_strides):
         sj = np.ma.masked_invalid(np.log10(psd_munge[j][field])).T
         tj = psd_munge[j]['epochs']
         fj = psd_munge[j]['freqs']
         ax.pcolormesh(tj,fj,sj,vmin=value_min,vmax=value_max,cmap=cmap.jet)
+        if type == 'plasma':
+            fsj = smoms_munge[j]['f_ps']
+            ts1 = smoms_munge[j]['epochs']
+            ax.plot(tsj,fsj,'w-')
+        if type == 'cyclotron':
+            fsj = smoms_munge[j]['f_cs']
+            tsj = smoms_munge[j]['epochs']
+            ax.plot(tsj,fsj,'w-')
+        if type == 'half_cyclotron':
+            fs1 = smoms_munge[0]['f_cs']
+            ts1 = smoms_munge[0]['epochs']            
+            ax.plot(tsj,fsj,'w-')
+            ax.plot(tsj,0.5*fsj,'w-')
+        if type == 'chorus':
+            fsj = smoms_munge[0]['f_cs']
+            tsj = smoms_munge[0]['epochs']
+            ax.plot(tsj,fsj,'w-')
+            ax.plot(tsj,0.5*fsj,'w-')
+            ax.plot(tsj,0.1*fsj,'w-')            
     
     cmap.jet.set_bad('k',alpha=1.0) 
     psdt_spec.set_colormap(cmap.jet)
@@ -424,6 +558,8 @@ def make_psd_panel(fig,ax,obs,psd_munge,field):
     if field == 'epsd':
         psdt_spec.cbar.set_label('$(V/m)^2/Hz$')
     return psdt_spec    
+    
+    
     
     #'$10^{%d}$'
     
