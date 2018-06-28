@@ -564,7 +564,7 @@ def calculate_current(emoms_munge,imoms_munge,species):
        Arguments:
           emoms_munge: a munge of the electron moments
           imoms_munge: a munge of the ion moments
-          species:     string from 'electron' or 'ion'
+          species:     string from 'electrons' or 'ions'
 
        Returns:
            nothing per se - adds the current to the smoms_munge as determined
