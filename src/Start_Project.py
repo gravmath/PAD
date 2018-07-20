@@ -59,11 +59,15 @@ prj_settings.close()
 
 prj_dict = {}
 
-for j in range(1,len(glob)):
-    namelist = [q.strip() for q in glob[j].split('=')]
-    prj_dict[namelist[0]] = namelist[1]
+for j in range(len(glob)):
+    line = glob[j].strip()
+    if line != '':
+        if line[0] != '#':
+            namelist = [q.strip() for q in line.split('=')]
+            prj_dict[namelist[0]] = namelist[1]
 
 base_dir               = prj_dict['base_dir']
+scanned_dir            = prj_dict['scanned_dir']
 download_dir           = prj_dict['download_dir']
 local_dir              = prj_dict['local_dir']
 scan_or_load           = prj_dict['scan_or_load']
@@ -155,30 +159,29 @@ start_time_srvy = prj_dict['start_time_srvy']
 stop_time_srvy  = prj_dict['stop_time_srvy']
  
 for obs in observatories:
-    if prj_dict['file source'] == 'server':
-        scanned_files_filename = 'c:/Users/cschiff/Documents/github/scanned_files_%s.fpiprd1' % (obs,)
-    else:
-        scanned_files_filename = 'c:/Users/cschiff/Documents/github/scanned_files_%s.local' % (obs,)
-
+    scanned_files_filename = prj_dict['scanned_dir']+prj_dict['file_source']+'/'+prj_dict['scanned_file_list'] % (obs,)
+    
+    #Survey Mode
+    #option 1 Scan:  scan the specified look directory to create a total file list
     if prj_dict['scan_or_load'] == 'scan':
-        print 'Preparing to scrape together files for %s from the %s drive and save to %s' % (obs, prj_dict['file source'],scanned_files_filename)
-        bpsd_fast_dict         = Scraper.get_my_l2_files(obs,'dsp', 'fast','bpsd',    base_dir,prj_dict['file source'])
-        epsd_fast_dict         = Scraper.get_my_l2_files(obs,'dsp', 'fast','epsd',    base_dir,prj_dict['file source'])
-        dce_brst_dict          = Scraper.get_my_l2_files(obs,'edp', 'brst','dce',     base_dir,prj_dict['file source'])
-        scpot_fast_dict        = Scraper.get_my_l2_files(obs,'edp', 'fast','scpot',   base_dir,prj_dict['file source'])
-        fgm_brst_dict          = Scraper.get_my_l2_files(obs,'fgm', 'brst','',        base_dir,prj_dict['file source'])
-        fgm_srvy_dict          = Scraper.get_my_l2_files(obs,'fgm', 'srvy','',        base_dir,prj_dict['file source'])        
-        fpi_brst_des_dist_dict = Scraper.get_my_l2_files(obs,'fpi', 'brst','des-dist',base_dir,prj_dict['file source'])
-        fpi_brst_des_moms_dict = Scraper.get_my_l2_files(obs,'fpi', 'brst','des-moms',base_dir,prj_dict['file source'])
-        fpi_brst_dis_dist_dict = Scraper.get_my_l2_files(obs,'fpi', 'brst','dis-dist',base_dir,prj_dict['file source'])
-        fpi_brst_dis_moms_dict = Scraper.get_my_l2_files(obs,'fpi', 'brst','dis-moms',base_dir,prj_dict['file source'])
-        fpi_fast_des_dist_dict = Scraper.get_my_l2_files(obs,'fpi', 'fast','des-dist',base_dir,prj_dict['file source'])
-        fpi_fast_des_moms_dict = Scraper.get_my_l2_files(obs,'fpi', 'fast','des-moms',base_dir,prj_dict['file source'])
-        fpi_fast_dis_dist_dict = Scraper.get_my_l2_files(obs,'fpi', 'fast','dis-dist',base_dir,prj_dict['file source'])
-        fpi_fast_dis_moms_dict = Scraper.get_my_l2_files(obs,'fpi', 'fast','dis-moms',base_dir,prj_dict['file source'])
-        hpca_brst_ion_dict     = Scraper.get_my_l2_files(obs,'hpca','brst','ion',     base_dir,prj_dict['file source'])
-        hpca_brst_moments_dict = Scraper.get_my_l2_files(obs,'hpca','brst','moments', base_dir,prj_dict['file source'])
-        mec_srvy_epht89d_dict  = Scraper.get_my_l2_files(obs,'mec', 'srvy','epht89d', base_dir,prj_dict['file source'])
+        print 'Preparing to scrape together files for %s from the %s drive and save to %s' % (obs, prj_dict['base_dir'],scanned_files_filename)
+        bpsd_fast_dict         = Scraper.get_my_l2_files(obs,'dsp', 'fast','bpsd',    base_dir,prj_dict['file_source'])
+        epsd_fast_dict         = Scraper.get_my_l2_files(obs,'dsp', 'fast','epsd',    base_dir,prj_dict['file_source'])
+        dce_brst_dict          = Scraper.get_my_l2_files(obs,'edp', 'brst','dce',     base_dir,prj_dict['file_source'])
+        scpot_fast_dict        = Scraper.get_my_l2_files(obs,'edp', 'fast','scpot',   base_dir,prj_dict['file_source'])
+        fgm_brst_dict          = Scraper.get_my_l2_files(obs,'fgm', 'brst','',        base_dir,prj_dict['file_source'])
+        fgm_srvy_dict          = Scraper.get_my_l2_files(obs,'fgm', 'srvy','',        base_dir,prj_dict['file_source'])        
+        fpi_brst_des_dist_dict = Scraper.get_my_l2_files(obs,'fpi', 'brst','des-dist',base_dir,prj_dict['file_source'])
+        fpi_brst_des_moms_dict = Scraper.get_my_l2_files(obs,'fpi', 'brst','des-moms',base_dir,prj_dict['file_source'])
+        fpi_brst_dis_dist_dict = Scraper.get_my_l2_files(obs,'fpi', 'brst','dis-dist',base_dir,prj_dict['file_source'])
+        fpi_brst_dis_moms_dict = Scraper.get_my_l2_files(obs,'fpi', 'brst','dis-moms',base_dir,prj_dict['file_source'])
+        fpi_fast_des_dist_dict = Scraper.get_my_l2_files(obs,'fpi', 'fast','des-dist',base_dir,prj_dict['file_source'])
+        fpi_fast_des_moms_dict = Scraper.get_my_l2_files(obs,'fpi', 'fast','des-moms',base_dir,prj_dict['file_source'])
+        fpi_fast_dis_dist_dict = Scraper.get_my_l2_files(obs,'fpi', 'fast','dis-dist',base_dir,prj_dict['file_source'])
+        fpi_fast_dis_moms_dict = Scraper.get_my_l2_files(obs,'fpi', 'fast','dis-moms',base_dir,prj_dict['file_source'])
+        hpca_brst_ion_dict     = Scraper.get_my_l2_files(obs,'hpca','brst','ion',     base_dir,prj_dict['file_source'])
+        hpca_brst_moments_dict = Scraper.get_my_l2_files(obs,'hpca','brst','moments', base_dir,prj_dict['file_source'])
+        mec_srvy_epht89d_dict  = Scraper.get_my_l2_files(obs,'mec', 'srvy','epht89d', base_dir,prj_dict['file_source'])
         scanned_files = open(scanned_files_filename, "w")
         pickle.dump(bpsd_fast_dict,scanned_files)         
         pickle.dump(epsd_fast_dict,scanned_files)         
@@ -198,8 +201,9 @@ for obs in observatories:
         pickle.dump(hpca_brst_moments_dict,scanned_files)         
         pickle.dump(mec_srvy_epht89d_dict,scanned_files)
         scanned_files.close()
+    #option 2 Load: load the total file list from the scanned file
     else:
-        print 'Reading in scraped files for %s on the %s drive from %s' % (obs, prj_dict['file source'],scanned_files_filename)        
+        print 'Reading in scraped files for %s on the %s drive from %s' % (obs, prj_dict['base_dir'],scanned_files_filename)        
         scanned_files          = open(scanned_files_filename,"r")
         bpsd_fast_dict         = pickle.load(scanned_files)
         epsd_fast_dict         = pickle.load(scanned_files)
@@ -220,25 +224,30 @@ for obs in observatories:
         mec_srvy_epht89d_dict  = pickle.load(scanned_files)
         scanned_files.close()
 
-    my_files['%s' % (obs,)]['bpsd_f']      = Scraper.limit_time_range(start_time_srvy,stop_time_srvy,bpsd_fast_dict)
-    my_files['%s' % (obs,)]['epsd_f']      = Scraper.limit_time_range(start_time_srvy,stop_time_srvy,epsd_fast_dict)
-    my_files['%s' % (obs,)]['dce_b']       = Scraper.limit_time_range(start_time_brst,stop_time_brst,dce_brst_dict)
-    my_files['%s' % (obs,)]['scpot_f']     = Scraper.limit_time_range(start_time_srvy,stop_time_srvy,scpot_fast_dict)
-    my_files['%s' % (obs,)]['fgm_b']       = Scraper.limit_time_range(start_time_brst,stop_time_brst,fgm_brst_dict)
-    my_files['%s' % (obs,)]['fgm_s']       = Scraper.limit_time_range(start_time_srvy,stop_time_srvy,fgm_srvy_dict)    
-    my_files['%s' % (obs,)]['edist_b']     = Scraper.limit_time_range(start_time_brst,stop_time_brst,fpi_brst_des_dist_dict)
-    my_files['%s' % (obs,)]['emoms_b']     = Scraper.limit_time_range(start_time_brst,stop_time_brst,fpi_brst_des_moms_dict)
-    my_files['%s' % (obs,)]['idist_b']     = Scraper.limit_time_range(start_time_brst,stop_time_brst,fpi_brst_dis_dist_dict)
-    my_files['%s' % (obs,)]['imoms_b']     = Scraper.limit_time_range(start_time_brst,stop_time_brst,fpi_brst_dis_moms_dict)
-    my_files['%s' % (obs,)]['edist_f']     = Scraper.limit_time_range(start_time_fast,stop_time_fast,fpi_fast_des_dist_dict)
-    my_files['%s' % (obs,)]['emoms_f']     = Scraper.limit_time_range(start_time_fast,stop_time_fast,fpi_fast_des_moms_dict)
-    my_files['%s' % (obs,)]['idist_f']     = Scraper.limit_time_range(start_time_fast,stop_time_fast,fpi_fast_dis_dist_dict)
-    my_files['%s' % (obs,)]['imoms_f']     = Scraper.limit_time_range(start_time_fast,stop_time_fast,fpi_fast_dis_moms_dict)
-    my_files['%s' % (obs,)]['hpca_ion_b']  = Scraper.limit_time_range(start_time_brst,stop_time_brst,hpca_brst_ion_dict)
-    my_files['%s' % (obs,)]['hpca_moms_b'] = Scraper.limit_time_range(start_time_brst,stop_time_brst,hpca_brst_moments_dict)
-    my_files['%s' % (obs,)]['mec_s']       = Scraper.limit_time_range(start_time_srvy,stop_time_srvy,mec_srvy_epht89d_dict)
-    
-    
+    #Filter:  filter the list by restricting the time
+    if prj_dict['filter']:
+        my_files['%s' % (obs,)]['bpsd_f']      = Scraper.limit_time_range(start_time_srvy,stop_time_srvy,bpsd_fast_dict)
+        my_files['%s' % (obs,)]['epsd_f']      = Scraper.limit_time_range(start_time_srvy,stop_time_srvy,epsd_fast_dict)
+        my_files['%s' % (obs,)]['dce_b']       = Scraper.limit_time_range(start_time_brst,stop_time_brst,dce_brst_dict)
+        my_files['%s' % (obs,)]['scpot_f']     = Scraper.limit_time_range(start_time_srvy,stop_time_srvy,scpot_fast_dict)
+        my_files['%s' % (obs,)]['fgm_b']       = Scraper.limit_time_range(start_time_brst,stop_time_brst,fgm_brst_dict)
+        my_files['%s' % (obs,)]['fgm_s']       = Scraper.limit_time_range(start_time_srvy,stop_time_srvy,fgm_srvy_dict)    
+        my_files['%s' % (obs,)]['edist_b']     = Scraper.limit_time_range(start_time_brst,stop_time_brst,fpi_brst_des_dist_dict)
+        my_files['%s' % (obs,)]['emoms_b']     = Scraper.limit_time_range(start_time_brst,stop_time_brst,fpi_brst_des_moms_dict)
+        my_files['%s' % (obs,)]['idist_b']     = Scraper.limit_time_range(start_time_brst,stop_time_brst,fpi_brst_dis_dist_dict)
+        my_files['%s' % (obs,)]['imoms_b']     = Scraper.limit_time_range(start_time_brst,stop_time_brst,fpi_brst_dis_moms_dict)
+        my_files['%s' % (obs,)]['edist_f']     = Scraper.limit_time_range(start_time_fast,stop_time_fast,fpi_fast_des_dist_dict)
+        my_files['%s' % (obs,)]['emoms_f']     = Scraper.limit_time_range(start_time_fast,stop_time_fast,fpi_fast_des_moms_dict)
+        my_files['%s' % (obs,)]['idist_f']     = Scraper.limit_time_range(start_time_fast,stop_time_fast,fpi_fast_dis_dist_dict)
+        my_files['%s' % (obs,)]['imoms_f']     = Scraper.limit_time_range(start_time_fast,stop_time_fast,fpi_fast_dis_moms_dict)
+        my_files['%s' % (obs,)]['hpca_ion_b']  = Scraper.limit_time_range(start_time_brst,stop_time_brst,hpca_brst_ion_dict)
+        my_files['%s' % (obs,)]['hpca_moms_b'] = Scraper.limit_time_range(start_time_brst,stop_time_brst,hpca_brst_moments_dict)
+        my_files['%s' % (obs,)]['mec_s']       = Scraper.limit_time_range(start_time_srvy,stop_time_srvy,mec_srvy_epht89d_dict)
+        prj_file_list = open(prj_dict['prj_file_list'],'w')
+        pickle.dump(my_files,prj_file_list)
+        prj_file_list.close()
+        
+    #Checkout:  download and store files locally    
     if prj_dict['load_local'] == 'True':
         for k in my_files['%s' % (obs,)].keys():
             for f in my_files['%s' % (obs,)][k]:
@@ -246,7 +255,3 @@ for obs in observatories:
                  print bf
                  shutil.copy(f,download_dir+bf)      
                  inventory_file(bf,local_dir,download_dir)
-                 
-prj_file = open(prj_dict['prj_filename'],'w')
-pickle.dump(my_files,prj_file)
-prj_file.close()

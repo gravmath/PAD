@@ -558,7 +558,26 @@ def make_psd_panel(fig,ax,obs,psd_munge,field,smoms_munge,type):
     if field == 'epsd':
         psdt_spec.cbar.set_label('$(V/m)^2/Hz$')
     return psdt_spec    
+
+
+###############################################################################
+def make_JdotE_panel(ax,obs,smoms_munge):
+    #determine the number of strides 
+    num_strides = len(smoms_munge)
+       
+    #graph and label the first segment
+    ts1 = smoms_munge[0]['epochs']
+    ns1 = smoms_munge[0]['JdotE']
+    n_trace = Grapher.curves(ax,ts1,ns1)
+   
+    for j in range(1,num_strides):
+        tsj = smoms_munge[j]['epochs']
+        nsj = smoms_munge[j]['JdotE']
+        n_trace.add_line(tsj,nsj)
+        n_trace.customize_li(j,{'color':'black'})
     
+    n_trace.customize_ax({'ylabel':'%s\\n$J\vec \cdot E\vec$\\n[$TBS$]'%obs})
+    return n_trace     
     
     
     #'$10^{%d}$'
