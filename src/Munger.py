@@ -11,8 +11,8 @@ fgm_delta      = 0.008
 fgm_delta_srvy = 1.0
 des_delta      = 0.031
 dis_delta      = 0.151
-des_delta_fast = 4.5
-dis_delta_fast = 4.5
+des_delta_fast = 5.0
+dis_delta_fast = 5.0
 mec_delta      = 2.5
 
 #translations

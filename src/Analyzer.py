@@ -575,7 +575,6 @@ def calculate_current(emoms_munge,imoms_munge,species):
               
        Note:  None
        """ 
-       
    
     if species == 'electrons':
         #determine the number of strides
@@ -599,6 +598,31 @@ def calculate_current(emoms_munge,imoms_munge,species):
              J[:,1] = imoms_munge[N]['num_den'][:]*(imoms_munge[N]['bulk_vs'][:,1] - amoms_munge[N]['bulk_vs'][:,1])
              J[:,2] = imoms_munge[N]['num_den'][:]*(imoms_munge[N]['bulk_vs'][:,2] - amoms_munge[N]['bulk_vs'][:,2])
              imoms_munge[N]['current'] = c_e*J*1e15 #1e15 - to go from cm^-3 and km/s to microamps / m^2
+ 
+###############################################################################  
+def calculate_JdotE(adce_munge,smoms_munge):
+    """Analysis function to calculate the power delivered (JdotE) 
+       from particle measurements
+
+       Arguments:
+          adce_munge:  a munge of the electric fields adapted to the 
+                       particle times
+          smoms_munge: a munge of the species moments
+
+       Returns:
+           nothing per se - adds the JdotE to the smoms_munge
+       
+       Example use:  
+           calculate_current(emoms_munge,imoms_munge,'electrons')
+              
+       Note:  None
+       """ 
+    #determine number of strides
+    num_strides = len(smoms_munge)
+    
+    for N in range(num_strides):
+        JdotE = np.sum(smoms_munge[N]['current']*adce_munge[N]['Egse'],axis=1)
+        smoms_munge[N]['JdotE'] = JdotE
              
 ###############################################################################    
 def subtract_internal_photoelectrons(sdist_munge,mode,n_photo,photo_f_file):

@@ -397,8 +397,13 @@ def make_Et_panel(fig,ax,obs,smoms_munge,species,scpot,min_val,max_val):
     Et_spec.add_colorbar(fig)
     ax.set_yscale('log')
     
-    ax.set_ylabel('%s\n%s\nEnergy\n[eV]'%(obs,species))
-    Et_spec.cbar.set_label('$keV/(cm^2 s sr keV)$')
+    if species == 'emoms':
+        species_type = 'electrons'
+    if species == 'imoms':
+        species_type = 'ions'
+    ax.set_ylabel('%s\n%s\nEnergy\n[eV]'%(obs.upper(),species_type))
+    
+    Et_spec.cbar.set_label('$keV/(cm^2\;s\;sr\;keV)$')
 
     return Et_spec
 
@@ -493,45 +498,28 @@ def make_Bvector_panel(ax,obs,Bmunge):
     
 ###############################################################################    
 def make_psd_panel(fig,ax,obs,psd_munge,field,smoms_munge,type):
-    #determine the number of segments
-    num_strides = len(psd_munge)
+    #determine the number of strides
+    num_psd_strides  = len(psd_munge)
+    num_moms_strides = len(smoms_munge) 
 
+    #plot the psd
     value_min = -11
     value_max = -4
     s1 = np.ma.masked_invalid(np.log10(psd_munge[0][field])).T
     t1 = psd_munge[0]['epochs']
     f1 = psd_munge[0]['freqs']
     psdt_spec = Grapher.patch(ax,t1,f1,s1,value_min,value_max)
-    if type == 'plasma':
-        fs1 = smoms_munge[0]['f_ps']
-        ts1 = smoms_munge[0]['epochs']
-        ax.plot(ts1,fs1,'w-')
-    if type == 'cyclotron':
-        fs1 = smoms_munge[0]['f_cs']
-        ts1 = smoms_munge[0]['epochs']
-        ax.plot(ts1,fs1,'w-')
-    if type == 'half_cyclotron':
-        fs1 = smoms_munge[0]['f_cs']
-        ts1 = smoms_munge[0]['epochs']
-        ax.plot(ts1,fs1,'w-')
-        ax.plot(ts1,0.5*fs1,'w-')
-    if type == 'chorus':
-        fs1 = smoms_munge[0]['f_cs']
-        ts1 = smoms_munge[0]['epochs']
-        ax.plot(ts1,fs1,'w-')
-        ax.plot(ts1,0.5*fs1,'w-')
-        ax.plot(ts1,0.1*fs1,'w-')
-
-        
-    for j in range(1,num_strides):
-        sj = np.ma.masked_invalid(np.log10(psd_munge[j][field])).T
+    for j in range(1,num_psd_strides):
+        sj  = np.ma.masked_invalid(np.log10(psd_munge[j][field])).T
         tj = psd_munge[j]['epochs']
         fj = psd_munge[j]['freqs']
         ax.pcolormesh(tj,fj,sj,vmin=value_min,vmax=value_max,cmap=cmap.jet)
+
+    for j in range(num_moms_strides):        
         if type == 'plasma':
             fsj = smoms_munge[j]['f_ps']
-            ts1 = smoms_munge[j]['epochs']
-            ax.plot(tsj,fsj,'w-')
+            tsj = smoms_munge[j]['epochs']
+            ax.plot(tsj,fsj,'w-',linewidth=2)
         if type == 'cyclotron':
             fsj = smoms_munge[j]['f_cs']
             tsj = smoms_munge[j]['epochs']
@@ -546,8 +534,18 @@ def make_psd_panel(fig,ax,obs,psd_munge,field,smoms_munge,type):
             tsj = smoms_munge[0]['epochs']
             ax.plot(tsj,fsj,'w-')
             ax.plot(tsj,0.5*fsj,'w-')
+            ax.plot(tsj,0.1*fsj,'w-')
+        if type == 'all':
+            fsj = smoms_munge[0]['f_cs']
+            tsj = smoms_munge[0]['epochs']
+            ax.plot(tsj,fsj,'w-')
+            ax.plot(tsj,0.5*fsj,'w-')
             ax.plot(tsj,0.1*fsj,'w-')            
-    
+            fsj = smoms_munge[j]['f_ps']
+            tsj = smoms_munge[j]['epochs']
+            ax.plot(tsj,fsj,'w-',linewidth=2)
+            
+            
     cmap.jet.set_bad('k',alpha=1.0) 
     psdt_spec.set_colormap(cmap.jet)
     psdt_spec.add_colorbar(fig)
