@@ -3,7 +3,10 @@ import matplotlib.dates        as mdates
 import numpy                   as np
 import scipy                   as sp
 import scipy.interpolate       as interp
+import spacepy.pycdf           as pycdf
 import Munger
+
+
 
 num_az         = 32
 num_polar      = 16
@@ -324,12 +327,39 @@ def calculate_differential_number_flux(sdist_munge,species):
         ms = m_e
     if species == 'ions':
         ms = m_p
-        
-    #differential number flux: j_n = 1/2 f v^4/E
-    #v^2 = 2 E / m -> j_n = 2(E/m)^2/E = 2E/m^2
+    
+    #for reference - an adaptation of Section 6.4.1 of Baumjohann
+    #
+    #6.4.1 Differential Particle Flux
+    #
+    #There is close relationship between J(W,\alpha,x), the differential particle
+    #flux per unit area at a given energy, angle, and position and the particle
+    #phase space distribution f(v,x,t).  A particle flux across a surface is given
+    #by the number density times the velocity component normal to the surface.
+    #Looked at differently, or, in other words, considering the particles found in 
+    #a velocity interval, dv, coming from a solid angle, d\Omega, the number density
+    #of particles with velocity v in a phase space volume element is dn = f v^2 dv d\Omega.
+    #Multiplying by v, one finds that the differential flux of particles with velocity
+    #v is given by
+    #
+    #   J(W,\alpha,x) dW d\Omega = f(v_{\para},v_{\perp},x) v^3 dv d\Omega (6.48)
+    #
+    #The left-hand side of this expression has been written in terms of the particle
+    #energy in the interval dW, simply because it is easier to measure the energy of
+    #particles in a certain interval than their individual velocities.  Since dW = mv dv,
+    #the relationship between the flux and the distribution function becomes simply
+    #
+    #   J(W,\alpha,x) = v^2/m f(v_{\para},v_{\perp},x)                     (6.49)
+    #
+    #a very useful formula which directly relates the measured flux in a certain
+    #energy interval to the velocity distribution function of the measured particles.
+    #
+    #
+    #differential number flux: j_n = v^2/m f (Eq. 6.49 Baumjohann)
+    # v^2 = 2 E / m -> j_n = 2E/m^2
     for N in range(num_strides):
-        jn = np.zeros(sdist_munge[N]['dist'].shape)
-        f  = sdist_munge[N]['dist']
+        jn = np.zeros(sdist_munge[N]['cdist'].shape)
+        f  = sdist_munge[N]['cdist']
         Es = sdist_munge[N]['ergs']
         for j in range(num_az):
             for k in range(num_polar):

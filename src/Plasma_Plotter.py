@@ -412,13 +412,13 @@ def make_counterstream_panel(fig,ax,obs,smoms_munge,species,min_val,max_val):
     #determine the number of segments
     num_strides = len(smoms_munge)
 
-    c1 = np.ma.masked_invalid(smoms_munge[0]['par']/smoms_munge[0]['anti']).T
-    t1 = smoms_munge[0]['epochs']
+    c1 = np.ma.masked_invalid(smoms_munge[0]['par'][:]/smoms_munge[0]['anti'][:]).T
+    t1 = smoms_munge[0]['epochs'][:]
     E1 = smoms_munge[0]['ergs'][0,:]
     Et_c_spec = Grapher.patch(ax,t1,E1,c1,min_val,max_val)
     
     for j in range(1,num_strides):
-        cj = np.ma.masked_invalid(smoms_munge[j]['par']/smoms_munge[j]['anti']).T
+        cj = np.ma.masked_invalid(smoms_munge[j]['par'][:]/smoms_munge[j]['anti'][:]).T
         tj = smoms_munge[j]['epochs']
         Ej = smoms_munge[j]['ergs'][0,:]
         ax.pcolormesh(tj,Ej,cj,vmin=min_val,vmax=max_val,cmap=cmap.bwr)
@@ -438,14 +438,14 @@ def make_trap_fraction_panel(fig,ax,obs,smoms_munge,species,min_val,max_val):
     #determine the number of segments
     num_strides = len(smoms_munge)
 
-    f1 = np.ma.masked_invalid(2.0*smoms_munge[0]['perp']/(smoms_munge[0]['anti'] + smoms_munge[0]['par'])).T
-    t1 = smoms_munge[0]['epochs']
+    f1 = np.ma.masked_invalid(2.0*smoms_munge[0]['perp'][:]/(smoms_munge[0]['anti'][:] + smoms_munge[0]['par'][:])).T
+    t1 = smoms_munge[0]['epochs'][:]
     E1 = smoms_munge[0]['ergs'][0,:]
     Et_f_spec = Grapher.patch(ax,t1,E1,f1,min_val,max_val)
     
     for j in range(1,num_strides):
-        fj = np.ma.masked_invalid(2.0*smoms_munge[j]['perp']/(smoms_munge[j]['anti'] + smoms_munge[j]['par'])).T
-        tj = smoms_munge[j]['epochs']
+        fj = np.ma.masked_invalid(2.0*smoms_munge[j]['perp'][:]/(smoms_munge[j]['anti'][:] + smoms_munge[j]['par'][:])).T
+        tj = smoms_munge[j]['epochs'][:]
         Ej = smoms_munge[j]['ergs'][0,:]
         ax.pcolormesh(tj,Ej,fj,vmin=min_val,vmax=max_val,cmap=cmap.bwr)
     
@@ -517,32 +517,32 @@ def make_psd_panel(fig,ax,obs,psd_munge,field,smoms_munge,type):
 
     for j in range(num_moms_strides):        
         if type == 'plasma':
-            fsj = smoms_munge[j]['f_ps']
-            tsj = smoms_munge[j]['epochs']
+            fsj = smoms_munge[j]['f_ps'][:]
+            tsj = smoms_munge[j]['epochs'][:]
             ax.plot(tsj,fsj,'w-',linewidth=2)
         if type == 'cyclotron':
-            fsj = smoms_munge[j]['f_cs']
-            tsj = smoms_munge[j]['epochs']
+            fsj = smoms_munge[j]['f_cs'][:]
+            tsj = smoms_munge[j]['epochs'][:]
             ax.plot(tsj,fsj,'w-')
         if type == 'half_cyclotron':
-            fs1 = smoms_munge[0]['f_cs']
-            ts1 = smoms_munge[0]['epochs']            
+            fsj = smoms_munge[j]['f_cs'][:]
+            tsj = smoms_munge[j]['epochs'][:]            
             ax.plot(tsj,fsj,'w-')
             ax.plot(tsj,0.5*fsj,'w-')
         if type == 'chorus':
-            fsj = smoms_munge[0]['f_cs']
-            tsj = smoms_munge[0]['epochs']
+            fsj = smoms_munge[j]['f_cs'][:]
+            tsj = smoms_munge[j]['epochs'][:]
             ax.plot(tsj,fsj,'w-')
             ax.plot(tsj,0.5*fsj,'w-')
             ax.plot(tsj,0.1*fsj,'w-')
         if type == 'all':
-            fsj = smoms_munge[0]['f_cs']
-            tsj = smoms_munge[0]['epochs']
+            fsj = smoms_munge[j]['f_cs'][:]
+            tsj = smoms_munge[j]['epochs'][:]
             ax.plot(tsj,fsj,'w-')
             ax.plot(tsj,0.5*fsj,'w-')
             ax.plot(tsj,0.1*fsj,'w-')            
-            fsj = smoms_munge[j]['f_ps']
-            tsj = smoms_munge[j]['epochs']
+            fsj = smoms_munge[j]['f_ps'][:]
+            tsj = smoms_munge[j]['epochs'][:]
             ax.plot(tsj,fsj,'w-',linewidth=2)
             
             

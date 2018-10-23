@@ -1,4 +1,7 @@
 import datetime as dt
+import dateutil.tz as tz
+import h5py
+import matplotlib.dates as mdates
 import numpy    as np
 from spacepy import pycdf
 
@@ -587,3 +590,115 @@ def adjust_epoch_by_delta(munge,delta):
     
     for N in range(num_strides):
         munge[N]['epochs'] = munge[N]['epochs'] + my_time_delta
+        
+        
+
+############################################################################# 
+def save_munge(munge,name,obs,h5file):
+    """Main function designed to save the munges to an H5 file for later
+    retrieval and modification.
+       
+       Arguments:
+          munge:       the munge to be saved
+          name:        name of the munge in the H5 file - need not be the 
+                       same as the variable name
+          obs:         string with 'mms1', 'mms2', ...
+          h5filename:  pointer to the h5file
+          
+       Returns:
+           True if successful or a False and a printed error message 
+           otherwise.
+       
+       Example use:  
+           save_munge(munge,'skippy',my_h5)
+              
+       Note:       
+           none
+       """    
+
+    #determine the number of strides
+    num_strides = len(munge)
+    
+    for stride in range(num_strides):
+        for k in munge[stride].keys():
+            h5path = '/%s/%s/stride%s/%s' % (obs,name,stride,k)
+            type_of_k = type(munge[stride][k])
+            if type_of_k == str or type_of_k == dt.datetime or type_of_k == int:
+                pass
+            else:
+                try:
+                    if munge[stride][k].dtype == 'object' or munge[stride][k].dtype == 'O':
+                        epoch_data = mdates.date2num([ munge[stride][k][i].replace(tzinfo=tz.tzutc()) for i in range(len(munge[stride][k]))])
+                        #h5file.create_dataset(h5path,data=(mdates.date2num(munge[stride][k])))
+                        h5file.create_dataset(h5path,data=epoch_data)
+                    else:
+                        h5file.create_dataset(h5path,data=(munge[stride][k]))
+                except:
+                    print 'Failed on ', k
+
+    return True
+
+#############################################################################     
+def load_munge(name,obs,h5file):
+    """Main function designed to load a munges from an H5 file for later
+    saving and modification.
+       
+       Arguments:
+          name:        the munge to be retrieved 
+          obs:         string with 'mms1', 'mms2', ... 
+          h5filename:  pointer to the h5file
+          
+       Returns:
+           munge if successful or a False and a printed error message 
+           otherwise.
+       
+       Example use:  
+           my_munge, h5file = load_munge('skippy',my_h5)
+              
+       Note:       
+           none
+       """ 
+        
+    #check to make sure the name is in the file
+    #by retrieving the number of strides
+    try:
+        groups      = h5file['/%s/%s'%(obs,name,)].items()
+        num_strides = len(groups)
+        print 'found %s strides' % (num_strides,)
+    except:
+        print "the h5 file doesn't have data under group: %s" % (name,)
+        return False
+        
+    #now create the munge
+    munge = []
+    try:
+        for stride in range(num_strides):
+            munge_dict = {}
+            things     = h5file['/%s/%s/stride%s/'%(obs,name,stride)].items()
+            for thing in things:
+                munge_dict[str(thing[0])] = h5file['/%s/%s/stride%s/%s'%(obs,name,stride,thing[0],)]
+                #print h5file['/%s/stride%s/%s'%(name,stride,thing[0],)].shape
+            munge.append(munge_dict)
+    except:
+        print "Can't retrieve data!"
+        return False
+        
+    return munge
+    
+#############################################################################
+def convert_epochs(munge):
+    #determine the number of strides
+    num_strides = len(munge)
+    
+    for num in range(num_strides):
+        munge[num]['epochs'] = np.array(mdates.num2date(munge[num]['epochs']))
+        
+        
+def report_epochs(munge):
+    
+    #determine the number of the strides in the munge
+    num_strides = len(munge)
+    
+    #report the epochs
+    for i in range(num_strides):
+        print i, '\t', munge[i]['epochs'][0], '  ', munge[i]['epochs'][-1]         
