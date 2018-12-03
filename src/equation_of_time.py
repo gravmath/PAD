@@ -1,5 +1,6 @@
+import datetime as dt
 import numpy as np
-from copy import deepcopy 
+
 ###########################################################################
 #    equation_of_time.py has a set of utility functions that perform basic 
 #       time-related tasks
@@ -10,32 +11,32 @@ from copy import deepcopy
 #       Meeus or [1]
 #       
 #       The calculation of GMST is taken from 'Approximate Sidereal Time' '
-#       from http://aa.usno.navy.mil/faq/docs/GAST.php - hereafter refered 
+#       from http://aa.usno.navy.mil/faq/docs/GAST.php - hereafter referred 
 #       to as [2]
 #          
 #       The time standard is Gregorian calendar format with UTC time 
 #       system
 #
-#        deg = pi/180
+#       deg = pi/180
 ############################################################################
-def DecimalDay(epoch_dict):
+def DecimalDay(epoch_dt):
 
-    day  = epoch_dict['day']
-    hour = epoch_dict['hour']
-    min  = epoch_dict['min']
-    sec  = epoch_dict['sec']
+    day  = epoch_dt.day
+    hour = epoch_dt.hour
+    min  = epoch_dt.minute
+    sec  = epoch_dt.second
 
     decimal_day = day + (hour + (min + sec/60.0)/60.0)/24.0
 
     return decimal_day
 
 ############################################################################
-def JulianDates(epoch_dict):
+def JulianDates(epoch_dt):
 
-    #unpack the epoch_dict for convenience (notation follows Eq. 4 of [1]
-    Y = epoch_dict['year']
-    M = epoch_dict['month']
-    D = DecimalDay(epoch_dict)
+    #unpack the epoch_dt for convenience (notation follows Eq. 4 of [1]
+    Y = epoch_dt.year
+    M = epoch_dt.month
+    D = DecimalDay(epoch_dt)
 
     #make the appropriate adjustment to Y and M (year and month) based on 
     #the discussion on page 3 of [1]
@@ -69,16 +70,16 @@ def calculate_obliquity(T):
 
     
 ############################################################################    
-def calculate_GMST(epoch_dict):
+def calculate_GMST(epoch_dt):
 
     #Get current Julian date and centuries since J2000.0 Epoch
-    JD,T = JulianDates(epoch_dict)
+    JD,T = JulianDates(epoch_dt)
 
     #Calculate elapsed days since J2000.0 epoch   
     D    = JD - 2451545.0
     
     #Calculate the decimal hours into the current day
-    frac = DecimalDay(epoch_dict) % 1.0
+    frac = DecimalDay(epoch_dt) % 1.0
     H    = frac*24.0
     
     #Calculate elapsed days of previous midnight since J2000.0 epoch

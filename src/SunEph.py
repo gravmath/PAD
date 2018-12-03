@@ -3,7 +3,7 @@ import equation_of_time as equ_of_time
 #import pdb
 deg          = np.pi/180
 
-def CalcSun_Low( epoch_dict ):
+def CalcSun_Low( epoch_dt ):
     '''CalcSunPos returns the sun's position with respect to the 
        earth for a specified epoch.  
        
@@ -15,7 +15,7 @@ def CalcSun_Low( epoch_dict ):
        deg = pi/180'''
 
     #1 - Get the Julian day (jul_day) and Julian century (T)
-    (jul_day, T) = equ_of_time.JulianDates(epoch_dict)
+    (jul_day, T) = equ_of_time.JulianDates(epoch_dt)
 
 
     #2 - get sun distance, sun right ascension and declination

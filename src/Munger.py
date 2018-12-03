@@ -19,6 +19,9 @@ dis_delta_fast = 5.0
 mec_delta      = 2.5
 
 #translations
+# I believe that 'special' and 'eval' are no longer any different but the 
+#naming has not been changed so as to not fix what ain't broke
+#
 
 #dsp (2) both fast
 bpsd_translation = {'epochs':['Epoch','null'],
@@ -132,6 +135,9 @@ imoms_translation_fast = {'epochs' :['Epoch','null'],
                           'T_par'  :['"%s_%s_temppara_fast" % (obs,"dis")','eval'],
                           'T_perp' :['"%s_%s_tempperp_fast" % (obs,"dis")','eval'],
                           'T_s'    :['"%s_%s_temptensor_gse_fast" % (obs,"dis")','eval'] }                       
+                          
+ecnts_translation = {'epochs'    :['Epoch','null'],
+                     'cnts'      :['"%s_%s_brstSkyMap_cnts" % (obs,"des")','eval'] }                          
                          
 #hpca (2)
 #coming whenever
@@ -195,7 +201,7 @@ def make_data_dict_via_translation(name,translation):
     return A    
     
 #############################################################################
-def make_munge_via_translation(obs,type,delta,file_list,translation):
+def make_munge_via_translation(obs,type,delta,file_list,translation,fn="None"):
     """Core function that uses an instrument-tailored hash to make a generic
       munge of all the data fed it in file_list
       
@@ -208,6 +214,7 @@ def make_munge_via_translation(obs,type,delta,file_list,translation):
                        of data
           translation: translation structure used to structure the munge based 
                        on the CDF file
+          fn:          optional filename to redirect the output
 
        Returns:
            The structured munge - a list of dictionary data atoms
@@ -217,7 +224,13 @@ def make_munge_via_translation(obs,type,delta,file_list,translation):
               
        Note:  The workhorse
       """
-
+    #import pdb; pdb.set_trace()
+    if fn != "None":
+        fh = open(fn,'a')
+        fh.write("****************************************\n")
+        fh.write("On obs %s at %s\n" % (obs,dt.datetime.now()) )        
+        
+        
     B       = []
     counter = 1
     segment = 1
@@ -242,11 +255,18 @@ def make_munge_via_translation(obs,type,delta,file_list,translation):
         cdf.close()
 
         #report the time span of the first segment
-        print 'segment %s - start: %s stop %s' % (segment,temp['epochs'][0],temp['epochs'][-1])
+        if fn == 'None':
+            print 'segment %s - start: %s stop %s' % (segment,temp['epochs'][0],temp['epochs'][-1])
+        else:
+            fh.write("segment %s - start: %s stop %s\n" % (segment,temp['epochs'][0],temp['epochs'][-1]))
+                    
         
         #pack it into the munge
         if A['num_segs'] == 0:
-            print 'fresh segment - first stride'
+            if fn == 'None':
+                print 'fresh segment - first stride'
+            else:
+               fh.write("fresh segment - first stride\n")
             A['start']      = temp['epochs'][0]
             A['stop']       = temp['epochs'][-1]
             for k in translation.keys():
@@ -254,7 +274,10 @@ def make_munge_via_translation(obs,type,delta,file_list,translation):
             A['num_segs'] += 1
         elif (temp['epochs'][0] - A['stop']).total_seconds() < delta and (temp['epochs'][0] - A['stop']).total_seconds() > 0.0:
             #segments are close enough to be considered adjacent but they don't overlap
-            print 'adjacency underway'
+            if fn == 'None':
+                print 'adjacency underway'
+            else:
+                fh.write("adjacency underway\n")
             A['stop']       = temp['epochs'][-1]
             for k in translation.keys():
                 num_dim = len(temp[k].shape)
@@ -265,7 +288,10 @@ def make_munge_via_translation(obs,type,delta,file_list,translation):
             A['num_segs'] += 1            
         elif (temp['epochs'][0] - A['stop']).total_seconds() < delta and (temp['epochs'][0] - A['stop']).total_seconds() < 0.0:
             #overlaps exist - assume that the coincident measurements are identical
-            print 'overlap detected - dealing with it'
+            if fn == 'None':
+                print 'overlap detected - dealing with it'
+            else:
+                fh.write("overlap detected - dealing with it\n")
             time_delta      = np.array([(temp['epochs'][j] - A['stop']).total_seconds() for j in range(len(temp['epochs']))])
             new_points      = np.where(time_delta > 0.0)
             if temp['epochs'][-1] > A['stop']:
@@ -283,7 +309,10 @@ def make_munge_via_translation(obs,type,delta,file_list,translation):
             A['num_segs']  += 1            
         elif (temp['epochs'][0] - A['stop']).total_seconds() > delta:
             #break in the epochs so that this is a new segment
-            print 'break in adjacency - new stride'
+            if fn == 'None':
+                print 'break in adjacency - new stride'
+            else:
+                fh.write("break in adjacency - new stride\n")
             B.append(A)
             counter += 1
             A          = make_data_dict_via_translation('%s_stride%s' % (type,counter),translation)
@@ -295,7 +324,13 @@ def make_munge_via_translation(obs,type,delta,file_list,translation):
         segment += 1
             
     B.append(A)
-    print 'Munged %s series for %s on %s!' % (len(B),type,obs)
+    if fn == 'None':
+        print 'Munged %s series for %s on %s!' % (len(B),type,obs)
+    else:
+        fh.write("Munged %s series for %s on %s!\n" % (len(B),type,obs))
+        fh.write("Finished at %s\n" % (dt.datetime.now(),))
+        fh.write("****************************************\n\n")
+        fh.close()
     return B
     
 #############################################################################        
@@ -683,6 +718,8 @@ def load_munge(name,obs,h5file):
         print "Can't retrieve data!"
         return False
         
+    convert_epochs(munge)
+    
     return munge
     
 #############################################################################
