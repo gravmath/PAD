@@ -23,12 +23,13 @@ survey_sets = [['dsp','fast','bpsd'],
                ['dsp','fast','epsd'],
                ['edp','fast','scpot'],
                ['fgm','srvy',''],
-               ['fpi','fast','des-moms'],
-               ['fpi','fast','dis-moms'],
-               ['hpca','srvy','moments'],
                ['mec','srvy','epht89d']]
+               
+fast_sets   = [['fpi','fast','des-moms'],
+               ['fpi','fast','dis-moms'],
+               ['hpca','srvy','moments']]
 
-survey_dist = [['fpi','fast','des-dist'],
+fast_dist   = [['fpi','fast','des-dist'],
                ['fpi','fast','dis-dist'],
                ['hpca','srvy','ion']]
 
@@ -431,13 +432,13 @@ def record_my_mms_l2_files(obs,instrument,mode,descriptor,base_dir,file_source,f
 
     if instrument in ['dsp','bpsd','epsd','mec']:
         timestamp = 8
-    if instrument in ['edp','edp_spdf','hpca','hpca_spdf','scpot','fpi']:
+    elif instrument in ['edp','edp_spdf','hpca','hpca_spdf','scpot','fpi']:
         timestamp = 14
-    if instrument == 'fgm' and mode == 'brst':
+    elif instrument == 'fgm' and mode == 'brst':
         timestamp = 14
-    if instrument == 'fgm' and mode == 'srvy':
+    elif instrument == 'fgm' and mode == 'srvy':
         timestamp = 8
-    if mode == 'srvy':
+    else:
         timestamp = 8
 
 
@@ -536,7 +537,7 @@ def scrape_a_drive(base_dir,master_filelist_filename,file_source):
     try:
         scanned_files = open(master_filelist_filename, "w")
     except:
-        workflow_log.write("Can't open the scraped file list!")
+        workflow_log.write("Can't open the scraped file list!\n")
 
     for obs in ['mms1','mms2','mms3','mms4']:
         bpsd_fast_dict         = record_my_mms_l2_files(obs,'dsp', 'fast','bpsd',    base_dir,file_source,workflow_log)
@@ -612,11 +613,16 @@ def filter_for_prj(base_dir,time_filters,project_filelist_filename,master_fileli
     stop_time_fast  = time_filters['stop_time_fast']
     start_time_srvy = time_filters['start_time_srvy']
     stop_time_srvy  = time_filters['stop_time_srvy']
+    
+    workflow_log.write("")
+    workflow_log.write("Survey files limited to:      %s and %s\n" % (start_time_srvy,stop_time_srvy))    
+    workflow_log.write("Fast Survey files limited to: %s and %s\n" % (start_time_fast,stop_time_fast))        
+    workflow_log.write("Burst files limited to:       %s and %s\n" % (start_time_fast,stop_time_fast))        
 
     try:
         scanned_files          = open(master_filelist_filename,"r")
     except:
-        workflow_log.write("Can't load the scraped file list!")
+        workflow_log.write("Can't load the scraped file list!\n")
         return False
 
     prj_files = {}
@@ -674,7 +680,7 @@ def filter_for_prj(base_dir,time_filters,project_filelist_filename,master_fileli
         pickle.dump(prj_files,prj_file_list)
         prj_file_list.close()        
     except:
-        workflow_log.write("Can't save the local project file list!")
+        workflow_log.write("Can't save the local project file list!\n")
         workflow_log.write("******************************************************************************\n")            
         return False    
         
@@ -826,6 +832,7 @@ def retrieve_SDC_data(data_sets,download_dir,inventory_base_dir,start_date,end_d
     report_file.write("SDC Retrieval Log:  %s\n" % (now,))
     report_file.write("Summary of SDC files over range from %s to %s\n" % (start_date,end_date))
     
+    #import pdb; pdb.set_trace()   
     for data_set in data_sets:
         instr          = data_set[0]
         data_rate_mode = data_set[1]
@@ -851,13 +858,15 @@ def retrieve_SDC_data(data_sets,download_dir,inventory_base_dir,start_date,end_d
                     file_name = download_file(my_download_request,download_dir)
                     attempt_count = 10
                     report_file.write("Success for %s!\n" %(file_item,))
+                    try:
+                        inventory_mms_file(file_item,inventory_base_dir,download_dir)
+                        report_file.write("Inventoried %s!\n" % (file_item,))
+                    except:
+                        report_file.write("Couldn't move %s.\n" % (file_item,))                    
                 except:
                     attempt_count += 1
                     report_file.write("Attempt %s for %s\n" % (file_item, len(file_item)))
-            if inventory_mms_file(file_item,inventory_base_dir,download_dir):
-                report_file.write("Inventoried %s!\n" % (file_item,))
-            else:
-                report_file.write("Couldn't move %s.\n" % (file_item,))
+
                 
     now = dt.datetime.now()
     report_file.write("\nCompleted retrieval from the SDC at %s - bye\n" % (now,))

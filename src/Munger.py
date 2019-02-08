@@ -11,12 +11,13 @@ epsd_delta     = 2.5
 scpot_delta    = 0.001
 dce_delta      = 0.00015
 fgm_delta      = 0.008
+fgm_delta      = 10.0
 fgm_delta_srvy = 1.0
 des_delta      = 0.031
 dis_delta      = 0.151
 des_delta_fast = 5.0
 dis_delta_fast = 5.0
-mec_delta      = 2.5
+mec_delta      = 45.0
 
 #translations
 # I believe that 'special' and 'eval' are no longer any different but the 
@@ -239,7 +240,11 @@ def make_munge_via_translation(obs,type,delta,file_list,translation,fn="None"):
 
     for f in file_list:
         #open the cdf
-        cdf  = pycdf.CDF(f)
+        try:
+            cdf  = pycdf.CDF(f)
+        except:
+            print "pycdf.CDF can't open %s!"
+            return False
         
         #make the temporary data dictionary and load
         temp = make_data_dict_via_translation('temp',translation)
@@ -254,18 +259,18 @@ def make_munge_via_translation(obs,type,delta,file_list,translation,fn="None"):
         #close the cdf
         cdf.close()
 
-        #report the time span of the first segment
-        if fn == 'None':
+        #report the time span of the first segment (note the temporary way of disabling the choice in printing to the screen)
+        if fn == 'None' or fn != 'None':
             print 'segment %s - start: %s stop %s' % (segment,temp['epochs'][0],temp['epochs'][-1])
-        else:
+        if fn != 'None':
             fh.write("segment %s - start: %s stop %s\n" % (segment,temp['epochs'][0],temp['epochs'][-1]))
                     
         
         #pack it into the munge
         if A['num_segs'] == 0:
-            if fn == 'None':
+            if fn == 'None' or fn != 'None':
                 print 'fresh segment - first stride'
-            else:
+            if fn != 'None':
                fh.write("fresh segment - first stride\n")
             A['start']      = temp['epochs'][0]
             A['stop']       = temp['epochs'][-1]
@@ -274,9 +279,9 @@ def make_munge_via_translation(obs,type,delta,file_list,translation,fn="None"):
             A['num_segs'] += 1
         elif (temp['epochs'][0] - A['stop']).total_seconds() < delta and (temp['epochs'][0] - A['stop']).total_seconds() > 0.0:
             #segments are close enough to be considered adjacent but they don't overlap
-            if fn == 'None':
+            if fn == 'None' or fn != 'None':
                 print 'adjacency underway'
-            else:
+            if fn != 'None':
                 fh.write("adjacency underway\n")
             A['stop']       = temp['epochs'][-1]
             for k in translation.keys():
@@ -288,9 +293,9 @@ def make_munge_via_translation(obs,type,delta,file_list,translation,fn="None"):
             A['num_segs'] += 1            
         elif (temp['epochs'][0] - A['stop']).total_seconds() < delta and (temp['epochs'][0] - A['stop']).total_seconds() < 0.0:
             #overlaps exist - assume that the coincident measurements are identical
-            if fn == 'None':
+            if fn == 'None' or fn != 'None':
                 print 'overlap detected - dealing with it'
-            else:
+            if fn != 'None':
                 fh.write("overlap detected - dealing with it\n")
             time_delta      = np.array([(temp['epochs'][j] - A['stop']).total_seconds() for j in range(len(temp['epochs']))])
             new_points      = np.where(time_delta > 0.0)
@@ -309,9 +314,9 @@ def make_munge_via_translation(obs,type,delta,file_list,translation,fn="None"):
             A['num_segs']  += 1            
         elif (temp['epochs'][0] - A['stop']).total_seconds() > delta:
             #break in the epochs so that this is a new segment
-            if fn == 'None':
+            if fn == 'None' or fn != 'None':
                 print 'break in adjacency - new stride'
-            else:
+            if fn != 'None':
                 fh.write("break in adjacency - new stride\n")
             B.append(A)
             counter += 1
@@ -324,9 +329,9 @@ def make_munge_via_translation(obs,type,delta,file_list,translation,fn="None"):
         segment += 1
             
     B.append(A)
-    if fn == 'None':
-        print 'Munged %s series for %s on %s!' % (len(B),type,obs)
-    else:
+    if fn == 'None' or fn != 'None':
+        print 'Munged %s series for %s on %s!\n' % (len(B),type,obs)
+    if fn != 'None':
         fh.write("Munged %s series for %s on %s!\n" % (len(B),type,obs))
         fh.write("Finished at %s\n" % (dt.datetime.now(),))
         fh.write("****************************************\n\n")
@@ -629,16 +634,23 @@ def adjust_epoch_by_delta(munge,delta):
         
 
 ############################################################################# 
-def save_munge(munge,name,obs,h5file):
+def save_munge(munge,name,obs,h5file,fn="None"):
     """Main function designed to save the munges to an H5 file for later
-    retrieval and modification.
+    retrieval and modification.  
+    
+    possible:  This only works on memory-entrant data 
+    from a set of CDFs.  IT IS NOT MEANT TO BE USED TO UPDATE THE H5.
+    Proven true on 2/7/19 - the current workaround is to delete the data set to 
+    be updated by hand and then rerun Munger.  But it would be better to 
+    do this within the code.
        
        Arguments:
           munge:       the munge to be saved
           name:        name of the munge in the H5 file - need not be the 
                        same as the variable name
           obs:         string with 'mms1', 'mms2', ...
-          h5filename:  pointer to the h5file
+          h5file:      pointer to the h5file
+          fn:          optional file for workflow output
           
        Returns:
            True if successful or a False and a printed error message 
@@ -651,28 +663,87 @@ def save_munge(munge,name,obs,h5file):
            none
        """    
 
+    #open the optional output file
+    if fn != "None":
+        fh = open(fn,'a')
+        fh.write("****************************************\n")
+        fh.write("Saving %s for obs %s at %s \n" % (name,obs,dt.datetime.now()) )        
+        fh.write("****************************************\n")
+        
     #determine the number of strides
     num_strides = len(munge)
-    
+
+    #loop over the strides and the keys to store the munge    
     for stride in range(num_strides):
         for k in munge[stride].keys():
-            h5path = '/%s/%s/stride%s/%s' % (obs,name,stride,k)
+            #first construct the dictionary structure of the portion of the munge
+            #to be saved
+            h5path    = '/%s/%s/stride%s/%s' % (obs,name,stride,k)
+            
+            #then determine the type of data being stored
             type_of_k = type(munge[stride][k])
+            
+            #finally, initially assume that the data can't be found in the file
+            #and then try to find the data in the file and, if found, set the 
+            #flag 'in_file' appropriately
+            in_file   = False
+            try:
+                data  = h5file[h5path]
+                in_file = True
+            except:
+                pass
+            
+            #import pdb; pdb.set_trace()
+            #the following test was designed to handle meta-data in the munge; however
+            #the new approach allows the metadata to be stored in the h5 and future
+            #development may take advantage of that
             if type_of_k == str or type_of_k == dt.datetime or type_of_k == int:
                 pass
+                
+            #if the data are contained in a numpy array, then store/update
+            #as appropriate 
             else:
-                try:
-                    if munge[stride][k].dtype == 'object' or munge[stride][k].dtype == 'O':
-                        epoch_data = mdates.date2num([ munge[stride][k][i].replace(tzinfo=tz.tzutc()) for i in range(len(munge[stride][k]))])
-                        #h5file.create_dataset(h5path,data=(mdates.date2num(munge[stride][k])))
-                        h5file.create_dataset(h5path,data=epoch_data)
-                    else:
-                        h5file.create_dataset(h5path,data=(munge[stride][k]))
-                except:
-                    print 'Failed on ', k
-
+                #find the length of the array
+                stride_len = len(munge[stride][k])
+                
+                #no corresponding data in the h5
+                if in_file == False:
+                    try:
+                        #convert epoch data to numbers via matplotlib.dates.date2num
+                        #before storing in the h5
+                        if munge[stride][k].dtype == 'object' or munge[stride][k].dtype == 'O':
+                            epoch_data = mdates.date2num([ munge[stride][k][i].replace(tzinfo=tz.tzutc()) for i in range(stride_len)])
+                            h5file.create_dataset(h5path,data=epoch_data)
+                        #otherwise just store the data
+                        else:
+                            h5file.create_dataset(h5path,data=(munge[stride][k]))
+                    except:
+                        if fn == "None":
+                            print 'Failed on ', k
+                        else:
+                            fh.write('Failed on %s\n' % (k,) )
+                #if data is in the h5
+                elif in_file == True:
+                    try:
+                        #convert epoch data to numbers via matplotlib.dates.date2num
+                        #before storing in the h5
+                        if munge[stride][k].dtype == 'object' or munge[stride][k].dtype == 'O':
+                            epoch_data = mdates.date2num([ munge[stride][k][i].replace(tzinfo=tz.tzutc()) for i in range(stride_len)])
+                            data[...] = epoch_data
+                        #otherwise just store the data
+                        else:
+                            data[...] = munge[stride][k]
+                    except:
+                        if fn == "None":
+                            print 'Failed on ', k
+                        else:
+                            fh.write('Failed on %s\n' % (k,) )
+    if fn != "None":
+        fh.write('Done with saving at %s.\n\n' % (dt.datetime.now()))
+        fh.close()
+        
     return True
-
+    
 #############################################################################     
 def load_munge(name,obs,h5file):
     """Main function designed to load a munges from an H5 file for later
@@ -681,7 +752,7 @@ def load_munge(name,obs,h5file):
        Arguments:
           name:        the munge to be retrieved 
           obs:         string with 'mms1', 'mms2', ... 
-          h5filename:  pointer to the h5file
+          h5file:      pointer to the h5file
           
        Returns:
            munge if successful or a False and a printed error message 
@@ -724,13 +795,28 @@ def load_munge(name,obs,h5file):
     
 #############################################################################
 def convert_epochs(munge):
+    """helper function that changes an numpy array of num2date's to
+       datetime objects for use in plotting.
+       
+       Arguments:
+          munge:       the munge whose epochs are to be converted
+          
+       Returns:
+          nothing per se
+       
+       Example use:  
+           convert_epochs(munge)
+              
+       Note:       
+           none
+       """ 
     #determine the number of strides
     num_strides = len(munge)
     
     for num in range(num_strides):
         munge[num]['epochs'] = np.array(mdates.num2date(munge[num]['epochs']))
         
-        
+#############################################################################        
 def report_epochs(munge):
     
     #determine the number of the strides in the munge
