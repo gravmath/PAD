@@ -211,8 +211,8 @@ def make_stemperature_panel(ax,obs,smoms_munge,species):
         T_trace.customize_li(0,{'color':'red', 'label':'$T_{e\perp}$'})
         T_trace.customize_li(1,{'color':'blue','label':'$T_{e\parallel}$'})
     if species == 'imoms':
-        T_trace.customize_li(2,{'color':'black','label':'$T_{i\perp}$'})
-        T_trace.customize_li(3,{'color':'green','label':'$T_{i\parallel}$'})
+        T_trace.customize_li(0,{'color':'black','label':'$T_{i\perp}$'})
+        T_trace.customize_li(1,{'color':'green','label':'$T_{i\parallel}$'})
     
     for j in range(1,num_strides):
         tsj      = smoms_munge[j]['epochs']
@@ -221,11 +221,11 @@ def make_stemperature_panel(ax,obs,smoms_munge,species):
         T_trace.add_line(tsj,Ts_perpj)
         T_trace.add_line(tsj,Ts_parj)
         if species == 'emoms':
-            T_trace.customize_li(4*j,{'color':'red'})
-            T_trace.customize_li(4*j+1,{'color':'blue'})
+            T_trace.customize_li(2*j,  {'color':'red'})
+            T_trace.customize_li(2*j+1,{'color':'blue'})
         if species == 'imoms':
-            T_trace.customize_li(4*j+2,{'color':'black'})
-            T_trace.customize_li(4*j+3,{'color':'green'})
+            T_trace.customize_li(2*j,  {'color':'black'})
+            T_trace.customize_li(2*j+1,{'color':'green'})
             
     if species == 'emoms':
         T_trace.customize_ax({'ylabel':'%s\\n$T_e$\\n[eV]'%obs,'ylim':[1,1e4],'yscale':'log'})
